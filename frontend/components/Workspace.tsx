@@ -1,3 +1,13 @@
+"use client"
+
+import axios from "axios";
+import { useState } from "react";
+import { firstConvo } from "../api"
+
+type QueryData = {
+  query: string;
+}
+
 export default function Workspace() {
   const recommendations = [
     {
@@ -20,6 +30,31 @@ export default function Workspace() {
     },
   ];
 
+  const [query, setQuery] = useState<QueryData>({ query: "" });
+
+  const handleChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const query = evt.currentTarget.value;
+    setQuery({ "query": query })
+  }
+
+  const handleSubmit = async (evt: React.SubmitEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    try {
+      const res = await firstConvo(query);
+      console.log("Response got: ", res);
+
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+      } else if (error instanceof Error) {
+        console.log(error);
+      } else {
+        console.log("Unknown Error: ", error)
+      }
+    }
+  }
+
   return (
     <div className="mt-16 grid grid-cols-12 gap-6">
       {/* Left Input Side */}
@@ -41,38 +76,46 @@ export default function Workspace() {
           </div>
 
           <div className="p-6">
-            <textarea
-              placeholder="Building ecommerce system with realtime inventory, analytical queries and scalable transactional workload..."
-              className="w-full min-h-[260px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none placeholder:text-zinc-600"
-            />
+            <form onSubmit={handleSubmit}>
+              <textarea
+                className="w-full min-h-[260px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none placeholder:text-zinc-600"
+                placeholder="Building ecommerce system with realtime inventory, analytical queries and scalable transactional workload..."
+                value={query.query}
+                onChange={handleChange}
+              />
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {[
-                "High write throughput",
-                "Relational schema",
-                "ACID consistency",
-                "Realtime inventory",
-                "Analytics workload",
-                "Scalable API layer",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-full border border-zinc-800 bg-black px-3 py-1.5 text-xs text-zinc-400"
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  "High write throughput",
+                  "Relational schema",
+                  "ACID consistency",
+                  "Realtime inventory",
+                  "Analytics workload",
+                  "Scalable API layer",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-full border border-zinc-800 bg-black px-3 py-1.5 text-xs text-zinc-400"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 flex items-center gap-4">
+                <button
+                  className="flex-1 rounded-2xl bg-zinc-100 py-3.5 text-sm font-medium text-black hover:bg-zinc-300 transition"
+                  type="submit"
                 >
-                  {item}
-                </div>
-              ))}
-            </div>
+                  Run Analysis
+                </button>
 
-            <div className="mt-8 flex items-center gap-4">
-              <button className="flex-1 rounded-2xl bg-zinc-100 py-3.5 text-sm font-medium text-black hover:bg-zinc-300 transition">
-                Run Analysis
-              </button>
+                <button className="rounded-2xl border border-zinc-800 bg-black px-5 py-3.5 text-sm text-zinc-400 hover:text-zinc-100 transition">
+                  Examples
+                </button>
+              </div>
+            </form>
 
-              <button className="rounded-2xl border border-zinc-800 bg-black px-5 py-3.5 text-sm text-zinc-400 hover:text-zinc-100 transition">
-                Examples
-              </button>
-            </div>
           </div>
         </div>
       </section>
