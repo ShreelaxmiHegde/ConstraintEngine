@@ -1,0 +1,26 @@
+{
+  "name": "agent_agno",
+  "version": "1.0.0",
+  "description": "Backend service for 'Database architect agent'",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShreelaxmiHegde/architect-agent.git"
+  },
+  "author": "ShreelaxmiHegde",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShreelaxmiHegde/architect-agent/issues"
+  },
+  "homepage": "https://github.com/ShreelaxmiHegde/architect-agent#readme",
+  "dependencies": {
+    "axios": "^1.16.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
