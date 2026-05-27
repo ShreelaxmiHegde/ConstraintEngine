@@ -15,42 +15,57 @@ model User {
 
   createdAt DateTime @default(now())
 
-  conversations Conversation[]
+  projects Project[]
 }
 
 model Guest {
-  id            String         @id @default(uuid()) @db.Uuid
-  createdAt     DateTime       @default(now())
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+
+  title                String?
+  rawDescription       String
+  extractedConstraints Json?
+  architectureState    Json?
+  decisions            Json?
+  unreslolvedQuestions Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
   conversations Conversation[]
 }
 
 model Conversation {
   id String @id @default(uuid()) @db.Uuid
 
-  title String?
+  title           String?
+  contextSnapshot String
+
+  projectId String? @db.Uuid
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId String? @db.Uuid
-  user   User?   @relation(fields: [userId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
 
-  guestId String? @db.Uuid
-  guest   Guest?  @relation(fields: [guestId], references: [id])
-
-  messages Message[]
+  exchanges Exchange[]
 }
 
-model Message {
-  id String @id @default(uuid()) @db.Uuid
+model Exchange {
+  id             String @id @default(uuid()) @db.Uuid
+  conversationId String @db.Uuid
 
-  role    String
-  content String
+  queryText    String
+  responseText String
 
-  tokenLen Int?
+  conversation Conversation @relation(fields: [conversationId], references: [id])
 
   createdAt DateTime @default(now())
-
-  conversationId String       @db.Uuid
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
