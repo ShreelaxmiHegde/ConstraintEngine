@@ -1,7 +1,18 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:8080",
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!baseURL) {
+  throw new Error(
+    "NEXT_PUBLIC_API_URL missing"
+  );
+}
+
+const api = axios.create({ baseURL });
+
+export const axiosPrivate = axios.create({
+  baseURL,
+  headers: { 'Content-Type': 'application/json' },
   withCredentials: true
 });
 
