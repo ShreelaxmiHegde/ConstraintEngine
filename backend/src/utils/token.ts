@@ -1,24 +1,42 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt';
+import { createHash, randomBytes } from "node:crypto";
 import "dotenv/config";
 import { ExpressError } from "./ExpressError.js";
 import { UserBody } from "../types/types.js";
+import prisma from "../lib/prisma.js";
+import { findUserById } from "../services/user.service.js";
+import {
+  JWT_SECRET,
+  JWT_REFRESH_TOKEN,
+  ACCESS_TTL,
+  REFRESH_TOKEN_SECRET,
+  REFRESH_TTL_SEC,
+  NODE_ENV
+} from "../constants.js";
+import { createRefreshToken } from "../services/auth.service.js";
+import { RefreshToken } from "@prisma/client";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_TOKEN;
-const ACCESS_TTL = '15m';
-const REFRESH_TTL_SEC = 60 * 60 * 24 * 7; // 7days
 
 export const sendToken = (res: Response, token: string) => {
   res.cookie("access_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: NODE_ENV === "production",
     sameSite:
-      process.env.NODE_ENV === "production"
+      NODE_ENV === "production"
         ? "none"
-        : "lax",
+        : "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
+}
+
+export const hashToken = (token: string) => {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+export const createJwtId = () => {
+  return randomBytes(16).toString("hex");
 }
 
 export const signAccessToken = (user: UserBody) => {
@@ -36,10 +54,8 @@ export const signAccessToken = (user: UserBody) => {
   );
 }
 
-export const signRefreshToken = (user: UserBody) => {
-  const payload = {
-    userId: user.id
-  }
+export const signRefreshToken = (userId: string, jwtId: string) => {
+  const payload = { userId, jwtId }
 
   if (!JWT_REFRESH_TOKEN) throw new ExpressError("Missing refresh token", 500);
 
@@ -52,22 +68,61 @@ export const signRefreshToken = (user: UserBody) => {
   return token;
 }
 
-// export const persistRefreshToken = async ({ user, refreshToken, jti, ip, userAgent }) => {
-//   const tokenHash = hashToken(refreshToken);
-//   const expiresAt = new Date(Date.now() + REFRESH_TTL_SEC * 1000);
-//   await RefreshToken.create({ user: user._id, tokenHash, jti, expiresAt, ip, userAgent });
-// }
+export const persistRefreshToken = async (
+  userId: string,
+  refreshToken: string,
+  jwtId: string,
+  ip: string,
+  userAgent: string
+) => {
+  if (!REFRESH_TOKEN_SECRET) throw new ExpressError("Missing refresh token secret", 500);
 
-export const setRefreshCookie = (res: Response, refreshToken) => {
-  const isProd = process.env.NODE_ENV === 'production';
+  const tokenHash = bcrypt.hashSync(refreshToken, REFRESH_TOKEN_SECRET);
+  const expiresAt = new Date(Date.now() + REFRESH_TTL_SEC * 1000);
+
+  await createRefreshToken(userId, tokenHash, jwtId, ip, userAgent, expiresAt);
+}
+
+export const setRefreshCookie = (res: Response, refreshToken: string) => {
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: NODE_ENV === "production",
     sameSite:
-      process.env.NODE_ENV === "production"
+      NODE_ENV === "production"
         ? "none"
-        : "lax",
-    path: '/api/auth/refresh',
+        : "strict",
+    path: '/auth/refresh',
     maxAge: REFRESH_TTL_SEC * 1000
   });
+}
+
+export const rotateRefreshToken = async (oldDoc: RefreshToken, userId: string, req: Request, res: Response) => {
+  // revoke old
+  const newJwtId = createJwtId();
+
+  await prisma.refreshToken.update({
+    where: { id: oldDoc.id },
+    data: {
+      revokedAt: new Date(),
+      replacedBy: newJwtId
+    }
+  });
+
+  const user = await findUserById(userId);
+
+  // issue new
+  const newAccess = signAccessToken(user);
+  const newRefresh = signRefreshToken(user.id, newJwtId);
+
+  await persistRefreshToken(
+    user.id,
+    newRefresh,
+    newJwtId,
+    req.ip ?? "",
+    req.headers['user-agent'] || ''
+  );
+
+  setRefreshCookie(res, newRefresh);
+
+  return { accessToken: newAccess };
 }
