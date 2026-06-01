@@ -1,21 +1,21 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { LoginBody, SignUpBody } from "../types/types.js";
-import { checkExistingUser, checkUser, createUser } from "../services/user.service.js";
+import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
+import { checkExistingUser, checkUser, createUser, findUserById } from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
-import { JWT_SALT, REFRESH_TOKEN_SECRET } from "../constants.js";
+import { JWT_SALT, JWT_SECRET, REFRESH_TOKEN_SECRET } from "../constants.js";
 import {
   createJwtId,
   hashToken,
   persistRefreshToken,
   rotateRefreshToken,
+  setAccessCookie,
   setRefreshCookie,
   signAccessToken,
   signRefreshToken
 } from "../utils/token.js";
-import prisma from "../lib/prisma.js";
-import { findDoc, updateRevokedDoc, updateTokenHash } from "../services/auth.service.js";
+import { findDoc, updateRevokedDoc, findDocWithTokenHashJwtId } from "../services/auth.service.js";
 
 
 export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
@@ -60,12 +60,17 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
     req.headers['user-agent'] || ''
   );
 
+  setAccessCookie(res, accessToken);
   setRefreshCookie(res, refreshToken);
 
   return res.status(200).json({
     success: true,
     message: "Login was successful",
-    accessToken
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    }
   });
 }
 
@@ -87,7 +92,7 @@ export const refresh = async (req: Request, res: Response) => {
   const tokenHash = hashToken(token);
   const jwtId = decoded.jwtId;
 
-  const doc = await updateTokenHash(tokenHash, jwtId);
+  const doc = await findDocWithTokenHashJwtId(tokenHash, jwtId);
 
   if (!doc) throw new ExpressError("Refresh token not recognized", 401);
   if (doc.revokedAt) throw new ExpressError("Refresh token revoked", 401);
@@ -95,8 +100,10 @@ export const refresh = async (req: Request, res: Response) => {
 
   const result = await rotateRefreshToken(doc, doc.userId, req, res);
 
+  setAccessCookie(res, result.accessToken);
+
   return res.json({
-    accessToken: result.accessToken
+    success: true
   });
 }
 
@@ -118,4 +125,23 @@ export const logout = async (req: Request, res: Response) => {
       message: "Logged out successfully"
     });
   }
+}
+
+export const getMe = async (req: Request, res: Response) => {
+  const token = req.cookies?.access_token;
+
+  if (!token) throw new ExpressError("Access token not found", 401);
+
+  if (!JWT_SECRET) throw new ExpressError("Missing JWT_SECTRET", 500);
+  const decoded = jwt.verify(token, JWT_SECRET);
+  const decodedUser = decoded as AuthPayload;
+  const user = await findUserById(decodedUser.userId);
+
+  return res.json({
+    user: {
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    }
+  });
 }

@@ -19,7 +19,7 @@ import { createRefreshToken } from "../services/auth.service.js";
 import { RefreshToken } from "@prisma/client";
 
 
-export const sendToken = (res: Response, token: string) => {
+export const setAccessCookie = (res: Response, token: string) => {
   res.cookie("access_token", token, {
     httpOnly: true,
     secure: NODE_ENV === "production",
@@ -27,7 +27,7 @@ export const sendToken = (res: Response, token: string) => {
       NODE_ENV === "production"
         ? "none"
         : "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 15 * 60 * 1000, // 15min
   });
 }
 

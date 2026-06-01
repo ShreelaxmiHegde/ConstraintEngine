@@ -1,19 +1,18 @@
 import "dotenv/config";
 import prisma from "../lib/prisma.js";
 import { Request, Response } from "express";
-import { conversationBody } from "../types.js";
+import { conversationBody } from "../types/types.js";
 import { saveMessage } from "../services/message.service.js";
 import { findOrCreateConversation } from "../services/conversation.service.js";
 import { createProject, updateProjectWithResponse } from "../services/project.service.js";
-
-const fastapiURL = process.env.FASTAPI_URL;
+import { fastapiURL } from "../constants.js";
 
 export const extractConstraints = async (req: Request<{}, {}, conversationBody>, res: Response) => {
   console.log("Request got: ", req.body);
   const content = req.body.content;
 
   // create guest user
-  const guest = await prisma.guest.create({});
+  const guest = await prisma.guestSession.create({});
   const guestId = guest.id;
   console.log(guest);
 
@@ -48,7 +47,7 @@ export const createGuestSession = async (req: Request<{}, {}, conversationBody>,
   const title = content.split(' ').slice(0, 3).join(' ');
 
   // create guest user
-  const guest = await prisma.guest.create({});
+  const guest = await prisma.guestSession.create({});
   const guestId = guest.id;
   console.log(guest);
 
