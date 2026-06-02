@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
 import { checkExistingUser, checkUser, createUser, findUserById } from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
-import { JWT_SALT, JWT_SECRET, REFRESH_TOKEN_SECRET } from "../constants.js";
+import { JWT_SECRET, REFRESH_TOKEN_SECRET } from "../constants.js";
 import {
   createJwtId,
   hashToken,
@@ -24,9 +24,8 @@ export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) =>
 
   await checkExistingUser(email);
 
-  if (!JWT_SALT) throw new ExpressError("Missing JWT salt", 409);
-
-  const passwordHash = bcrypt.hashSync(password, JWT_SALT);
+  const saltRounds = 10;
+  const passwordHash = bcrypt.hashSync(password, saltRounds);
 
   const registerUser = await createUser(username, email, passwordHash);
 

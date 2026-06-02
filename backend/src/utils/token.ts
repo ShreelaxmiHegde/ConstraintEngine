@@ -77,7 +77,8 @@ export const persistRefreshToken = async (
 ) => {
   if (!REFRESH_TOKEN_SECRET) throw new ExpressError("Missing refresh token secret", 500);
 
-  const tokenHash = bcrypt.hashSync(refreshToken, REFRESH_TOKEN_SECRET);
+  const saltRounds = 10;
+  const tokenHash = bcrypt.hashSync(refreshToken, saltRounds);
   const expiresAt = new Date(Date.now() + REFRESH_TTL_SEC * 1000);
 
   await createRefreshToken(userId, tokenHash, jwtId, ip, userAgent, expiresAt);
