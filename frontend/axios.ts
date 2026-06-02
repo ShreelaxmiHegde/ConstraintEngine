@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const baseURL = "http://localhost:8080";
 
 if (!baseURL) {
   throw new Error(
@@ -15,26 +15,24 @@ const api = axios.create({
 
 api.interceptors.response.use(
   response => response,
-
   async (error) => {
     const originalRequest = error.config;
 
     if (
-      error.response.status === 401 &&
-      !originalRequest._retry
+      error.response?.status === 401 &&
+      originalRequest.url !== "/auth/refresh"
     ) {
-      originalRequest._retry = true;
-
       try {
-        await api.post('auth/refresh');
+        await api.post("/auth/refresh");
+
         return api(originalRequest);
       } catch {
-        window.location.href = '/login';
+        return Promise.reject(error);
       }
     }
 
     return Promise.reject(error);
   }
-)
+);
 
 export default api;
