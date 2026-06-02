@@ -23,10 +23,23 @@ export type AuthContextType = {
   currUser: User | null
   setCurrUser: React.Dispatch<React.SetStateAction<User | null>>
 
-  loading: true | false
-  setLoading: React.Dispatch<React.SetStateAction<true | false>>
+  loading: boolean
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export type AuthProviderProps = {
   children: React.ReactNode
 }
+
+export type AuthModalContextType = {
+  openAuth: (type: AuthModalType) => void;
+  closeAuth: () => void;
+}
+
+export type AuthModalType = "login" | "signup";
+
+export type AuthModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  mode: AuthModalType
+};
