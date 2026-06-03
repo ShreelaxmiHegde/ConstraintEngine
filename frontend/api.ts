@@ -15,7 +15,7 @@ export const login = async (formdata: LoginInput) => {
 
 export const logout = async () => {
   console.log("logging user out...");
-  const response = await api.get('auth/logout');
+  const response = await api.post('auth/logout');
   return response.data;
 }
 
