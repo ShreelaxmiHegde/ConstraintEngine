@@ -36,7 +36,7 @@ export type AuthModalContextType = {
   closeAuth: () => void;
 }
 
-export type AuthModalType = "login" | "signup";
+export type AuthModalType = "login" | "signup" | "logout";
 
 export type AuthModalProps = {
   isOpen: boolean;

@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
 import { signup } from "@/api";
 import { useAuth } from "@/context/useAuth";
 import { useAuthModal } from "@/context/useAuthModal";
 
 
 export default function LoginForm() {
-  const { openAuth } = useAuthModal();
+  const { openAuth, closeAuth } = useAuthModal();
   const { setCurrUser } = useAuth();
 
   const [formdata, setFormdata] = useState({
@@ -23,7 +23,9 @@ export default function LoginForm() {
     });
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (evt: ChangeEvent) => {
+    evt.preventDefault();
+
     try {
       const response = await signup(formdata);
       console.log(response);
@@ -31,6 +33,8 @@ export default function LoginForm() {
       setCurrUser(response.user);
     } catch (err) {
       console.log("Error logging in: ", err)
+    } finally {
+      closeAuth();
     }
   }
 

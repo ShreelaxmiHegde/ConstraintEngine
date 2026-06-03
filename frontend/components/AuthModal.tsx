@@ -1,6 +1,7 @@
 "use client";
 
 import LoginForm from "./LoginForm";
+import Logout from "./Logout";
 import SignupForm from "./SignupForm";
 import { AuthModalProps } from "@/types";
 
@@ -35,11 +36,9 @@ export default function AuthModal({
           </button>
 
           <div className="p-8">
-            {mode === "login" ? (
-              <LoginForm />
-            ) : (
-              <SignupForm />
-            )}
+            {mode === "login" && <LoginForm />}
+            {mode === "signup" && <SignupForm />}
+            {mode === "logout" && <Logout />}
           </div>
         </div>
       </div>
