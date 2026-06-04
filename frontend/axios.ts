@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useToastStore } from "./store/toastStore";
 
 const baseURL = "http://localhost:8080";
 
@@ -30,6 +31,38 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
     }
+
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => {
+    if (
+      response.data.message
+    ) {
+      useToastStore
+        .getState()
+        .addToast(
+          "success",
+          response.data.message
+        );
+    }
+
+    return response;
+  },
+
+  (error) => {
+    console.log(error.response?.data);
+
+    useToastStore
+      .getState()
+      .addToast(
+        "error",
+        error.response?.data
+          ?.message ??
+        "Something went wrong"
+      );
 
     return Promise.reject(error);
   }
