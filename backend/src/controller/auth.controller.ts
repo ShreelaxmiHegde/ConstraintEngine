@@ -28,13 +28,29 @@ export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) =>
   const saltRounds = 10;
   const passwordHash = bcrypt.hashSync(password, saltRounds);
 
-  const registerUser = await user.create(username, email, passwordHash);
+  const userData = await user.create(username, email, passwordHash);
+
+  // auto-login
+  const accessToken = signAccessToken(userData);
+  const jwtId = createJwtId();
+  const refreshToken = signRefreshToken(userData.id, jwtId);
+
+  await persistRefreshToken(
+    userData.id,
+    refreshToken,
+    jwtId,
+    req.ip ?? "",
+    req.headers['user-agent'] || ''
+  );
+
+  setAccessCookie(res, accessToken);
+  setRefreshCookie(res, refreshToken);
 
   return res.status(200).json({
     message: "User registered successfully",
     user: {
-      username: registerUser.username,
-      email: registerUser.email
+      username: userData.username,
+      email: userData.email
     }
   });
 }
