@@ -7,11 +7,9 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ) {
-  console.error(err);
 
-  if (err.message == "TokenExpiredError") err.message = "Access token expired";
-
-  res.status(err.statusCode || 500).json({
+  return res.status(err.statusCode || 500).json({
+    statusCode: err.statusCode,
     message: err.message || "Internal Server Error"
   });
 }

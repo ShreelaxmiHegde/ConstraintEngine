@@ -10,15 +10,15 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(errorHandler);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 
-
 app.use("/auth", authRouter);
 app.use("/m", messageRouter);
+
+app.use(errorHandler);
 
 export default app;

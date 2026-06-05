@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
 import * as user from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
@@ -91,11 +91,11 @@ export const refresh = async (req: Request, res: Response) => {
     }
 
   } catch (error: unknown) {
-    if (error instanceof JsonWebTokenError) {
+    if (error instanceof jwt.JsonWebTokenError) {
       throw new ExpressError(error.message, 401);
     }
 
-    throw error;
+    throw new ExpressError("Invalid token", 401);
   }
 
   const tokenHash = hashToken(token);
@@ -128,7 +128,7 @@ export const logout = async (req: Request, res: Response) => {
       await refreshSession.revoke(session.id);
     }
 
-    res.clearCookie('refresh_token', { path: '/auth/refresh' });
+    res.clearCookie('refresh_token', { path: '/auth/' });
 
     return res.json({
       success: true
