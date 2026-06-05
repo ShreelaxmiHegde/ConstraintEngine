@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
-import { checkExistingUser, checkUser, createUser, findUserById } from "../services/user.service.js";
+import * as user from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 import { JWT_SECRET, REFRESH_TOKEN_SECRET } from "../constants.js";
 import {
@@ -15,19 +15,20 @@ import {
   signAccessToken,
   signRefreshToken
 } from "../utils/token.js";
-import { findDoc, updateRevokedDoc, findDocWithTokenHashJwtId } from "../services/auth.service.js";
+import * as refreshSession from "../services/auth.service.js";
 
 
 export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
   console.log("Signup Request: ", req.body);
   const { username, email, password } = req.body;
 
-  await checkExistingUser(email);
+  const userExist = await user.findByEmail(email);
+  if (userExist) throw new ExpressError("An account with this email already exist", 409);
 
   const saltRounds = 10;
   const passwordHash = bcrypt.hashSync(password, saltRounds);
 
-  const registerUser = await createUser(username, email, passwordHash);
+  const registerUser = await user.create(username, email, passwordHash);
 
   return res.status(200).json({
     message: "User registered successfully",
@@ -42,17 +43,18 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
   console.log("Login Request: ", req.body);
   const { email, password } = req.body;
 
-  const user = await checkUser(email);
+  const userData = await user.findByEmail(email);
+  if (!userData) throw new ExpressError("User not found!", 404)
 
-  const isMatch = bcrypt.compareSync(password, user?.passwordHash);
+  const isMatch = bcrypt.compareSync(password, userData?.passwordHash);
   if (!isMatch) throw new ExpressError("Invalid credentials", 401);
 
-  const accessToken = signAccessToken(user);
+  const accessToken = signAccessToken(userData);
   const jwtId = createJwtId();
-  const refreshToken = signRefreshToken(user.id, jwtId);
+  const refreshToken = signRefreshToken(userData.id, jwtId);
 
   await persistRefreshToken(
-    user.id,
+    userData.id,
     refreshToken,
     jwtId,
     req.ip ?? "",
@@ -66,9 +68,9 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
     success: true,
     message: "Login was successful",
     user: {
-      id: user.id,
-      username: user.username,
-      email: user.email
+      id: userData.id,
+      username: userData.username,
+      email: userData.email
     }
   });
 }
@@ -99,13 +101,13 @@ export const refresh = async (req: Request, res: Response) => {
   const tokenHash = hashToken(token);
   const jwtId = decoded.jwtId;
 
-  const doc = await findDocWithTokenHashJwtId(tokenHash, jwtId);
+  const session = await refreshSession.findByTokenAndJti(tokenHash, jwtId);
 
-  if (!doc) throw new ExpressError("Refresh token not recognized", 401);
-  if (doc.revokedAt) throw new ExpressError("Refresh token revoked", 401);
-  if (doc.expiresAt < new Date()) throw new ExpressError("Refresh token expired", 401);
+  if (!session) throw new ExpressError("Refresh token not recognized", 401);
+  if (session.revokedAt) throw new ExpressError("Refresh token revoked", 401);
+  if (session.expiresAt < new Date()) throw new ExpressError("Refresh token expired", 401);
 
-  const result = await rotateRefreshToken(doc, doc.userId, req, res);
+  const result = await rotateRefreshToken(session.id, session.userId, req, res);
 
   setAccessCookie(res, result.accessToken);
 
@@ -120,10 +122,10 @@ export const logout = async (req: Request, res: Response) => {
   if (token) {
     const tokenHash = hashToken(token);
 
-    const doc = await findDoc(tokenHash);
+    const session = await refreshSession.findByTokenHash(tokenHash);
 
-    if (doc && !doc.revokedAt) {
-      await updateRevokedDoc(doc);
+    if (session && !session.revokedAt) {
+      await refreshSession.revoke(session.id);
     }
 
     res.clearCookie('refresh_token', { path: '/auth/refresh' });
@@ -146,13 +148,13 @@ export const getMe = async (req: Request, res: Response) => {
   if (!JWT_SECRET) throw new ExpressError("Missing JWT_SECTRET", 500);
   const decoded = jwt.verify(token, JWT_SECRET);
   const decodedUser = decoded as AuthPayload;
-  const user = await findUserById(decodedUser.userId);
+  const userData = await user.findById(decodedUser.userId);
 
   return res.json({
     user: {
-      userId: user.id,
-      username: user.username,
-      email: user.email,
+      userId: userData.id,
+      username: userData.username,
+      email: userData.email,
     }
   });
 }

@@ -5,7 +5,7 @@ import "dotenv/config";
 import { ExpressError } from "./ExpressError.js";
 import { UserBody } from "../types/types.js";
 import prisma from "../lib/prisma.js";
-import { findUserById } from "../services/user.service.js";
+import * as user from "../services/user.service.js";
 import {
   JWT_SECRET,
   ACCESS_TTL,
@@ -13,9 +13,7 @@ import {
   REFRESH_TTL_SEC,
   NODE_ENV
 } from "../constants.js";
-import { createRefreshToken } from "../services/auth.service.js";
-import { RefreshToken } from "@prisma/client";
-
+import * as refreshSession from "../services/auth.service.js";
 
 export const setAccessCookie = (res: Response, token: string) => {
   res.cookie("access_token", token, {
@@ -78,7 +76,7 @@ export const persistRefreshToken = async (
   const tokenHash = hashToken(refreshToken);
   const expiresAt = new Date(Date.now() + REFRESH_TTL_SEC * 1000);
 
-  await createRefreshToken(userId, tokenHash, jwtId, ip, userAgent, expiresAt);
+  await refreshSession.create(userId, tokenHash, jwtId, ip, userAgent, expiresAt);
 }
 
 export const setRefreshCookie = (res: Response, refreshToken: string) => {
@@ -94,26 +92,26 @@ export const setRefreshCookie = (res: Response, refreshToken: string) => {
   });
 }
 
-export const rotateRefreshToken = async (oldDoc: RefreshToken, userId: string, req: Request, res: Response) => {
+export const rotateRefreshToken = async (oldSessionId: string, userId: string, req: Request, res: Response) => {
   // revoke old
   const newJwtId = createJwtId();
 
-  await prisma.refreshToken.update({
-    where: { id: oldDoc.id },
+  await prisma.refreshSession.update({
+    where: { id: oldSessionId },
     data: {
       revokedAt: new Date(),
       replacedBy: newJwtId
     }
   });
 
-  const user = await findUserById(userId);
+  const userData = await user.findById(userId);
 
   // issue new
-  const newAccess = signAccessToken(user);
-  const newRefresh = signRefreshToken(user.id, newJwtId);
+  const newAccess = signAccessToken(userData);
+  const newRefresh = signRefreshToken(userData.id, newJwtId);
 
   await persistRefreshToken(
-    user.id,
+    userData.id,
     newRefresh,
     newJwtId,
     req.ip ?? "",

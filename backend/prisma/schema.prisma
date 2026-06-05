@@ -17,7 +17,7 @@ model User {
 
   guestsession GuestSession[]
   projects     Project[]
-  refreshtoken RefreshToken[]
+  refreshtoken RefreshSession[]
 }
 
 model GuestSession {
@@ -83,7 +83,7 @@ model Exchange {
   @@unique([conversationId, sequenceNumber])
 }
 
-model RefreshToken {
+model RefreshSession {
   id        String @id @default(uuid()) @db.Uuid
   userId    String @db.Uuid
   jwtId     String @unique

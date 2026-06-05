@@ -1,8 +1,7 @@
-import { emitWarning } from "node:process";
 import prisma from "../lib/prisma.js"
 import { ExpressError } from "../utils/ExpressError.js";
 
-export const createUser = async (
+export const create = async (
   username: string,
   email: string,
   passwordHash: string
@@ -19,26 +18,22 @@ export const createUser = async (
   return user;
 }
 
-export const checkUser = async (email: string) => {
+export const findByEmail = async (email: string) => {
   const user = await prisma.user.findUnique({
     where: {
       email: email
     }
+  });
+
+  return user;
+}
+
+export const findById = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
   });
 
   if (!user) throw new ExpressError("User not found", 404);
 
   return user;
-}
-
-export const checkExistingUser = async (email: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email
-    }
-  });
-
-  if (user) throw new ExpressError("User already exist", 404);
-
-  return;
 }

@@ -1,8 +1,7 @@
-import { RefreshToken } from "@prisma/client";
 import prisma from "../lib/prisma.js"
 
 
-export const createRefreshToken = async (
+export const create = async (
   userId: string,
   tokenHash: string,
   jwtId: string,
@@ -10,7 +9,7 @@ export const createRefreshToken = async (
   userAgent: string,
   expiresAt: Date
 ) => {
-  await prisma.refreshToken.create({
+  await prisma.refreshSession.create({
     data: {
       userId,
       tokenHash,
@@ -22,23 +21,23 @@ export const createRefreshToken = async (
   });
 }
 
-export const updateTokenHash = async (tokenHash: string, jwtId: string) => {
-  const doc = await prisma.refreshToken.findFirst({
+export const findByTokenAndJti = async (tokenHash: string, jwtId: string) => {
+  const session = await prisma.refreshSession.findUnique({
     where: { tokenHash, jwtId }
   });
 
-  return doc;
+  return session;
 }
 
-export const findDoc = async (tokenHash: string) => {
-  const doc = prisma.refreshToken.findFirst({ where: { tokenHash } });
+export const findByTokenHash = async (tokenHash: string) => {
+  const session = prisma.refreshSession.findFirst({ where: { tokenHash } });
 
-  return doc;
+  return session;
 }
 
-export const updateRevokedDoc = async (doc: RefreshToken) => {
-  await prisma.refreshToken.update({
-    where: { id: doc.id },
+export const revoke = async (sessionId: string) => {
+  await prisma.refreshSession.update({
+    where: { id: sessionId },
     data: { revokedAt: new Date() }
   });
 }
