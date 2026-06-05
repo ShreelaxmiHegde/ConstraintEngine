@@ -15,28 +15,6 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  response => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (
-      error.response?.status === 401 &&
-      originalRequest.url !== "/auth/refresh"
-    ) {
-      try {
-        await api.post("/auth/refresh");
-
-        return api(originalRequest);
-      } catch {
-        return Promise.reject(error);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
   (response) => {
     if (
       response.data.message
@@ -54,6 +32,16 @@ api.interceptors.response.use(
 
   (error) => {
     console.log(error.response?.data);
+
+    if (
+      error.response?.status === 401 &&
+      (
+        error.config.url === "/auth/me" ||
+        error.config.url === "/auth/refresh"
+      )
+    ) {
+      return Promise.reject(error);
+    }
 
     useToastStore
       .getState()
