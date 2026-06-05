@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import bcrypt from 'bcrypt';
 import { createHash, randomBytes } from "node:crypto";
 import "dotenv/config";
 import { ExpressError } from "./ExpressError.js";
@@ -9,7 +8,6 @@ import prisma from "../lib/prisma.js";
 import { findUserById } from "../services/user.service.js";
 import {
   JWT_SECRET,
-  JWT_REFRESH_TOKEN,
   ACCESS_TTL,
   REFRESH_TOKEN_SECRET,
   REFRESH_TTL_SEC,
@@ -57,11 +55,11 @@ export const signAccessToken = (user: UserBody) => {
 export const signRefreshToken = (userId: string, jwtId: string) => {
   const payload = { userId, jwtId }
 
-  if (!JWT_REFRESH_TOKEN) throw new ExpressError("Missing refresh token", 500);
+  if (!REFRESH_TOKEN_SECRET) throw new ExpressError("Missing refresh token", 500);
 
   const token = jwt.sign(
     payload,
-    JWT_REFRESH_TOKEN,
+    REFRESH_TOKEN_SECRET,
     { expiresIn: REFRESH_TTL_SEC }
   );
 
@@ -77,8 +75,7 @@ export const persistRefreshToken = async (
 ) => {
   if (!REFRESH_TOKEN_SECRET) throw new ExpressError("Missing refresh token secret", 500);
 
-  const saltRounds = 10;
-  const tokenHash = bcrypt.hashSync(refreshToken, saltRounds);
+  const tokenHash = hashToken(refreshToken);
   const expiresAt = new Date(Date.now() + REFRESH_TTL_SEC * 1000);
 
   await createRefreshToken(userId, tokenHash, jwtId, ip, userAgent, expiresAt);
@@ -92,7 +89,7 @@ export const setRefreshCookie = (res: Response, refreshToken: string) => {
       NODE_ENV === "production"
         ? "none"
         : "strict",
-    path: '/auth/refresh',
+    path: '/auth/',
     maxAge: REFRESH_TTL_SEC * 1000
   });
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
 import { checkExistingUser, checkUser, createUser, findUserById } from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
@@ -83,9 +83,17 @@ export const refresh = async (req: Request, res: Response) => {
   let decoded;
   try {
     decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
-    if (typeof decoded === "string") throw new ExpressError("Invalid token payload", 401);
-  } catch (error) {
-    throw new ExpressError("Invalid or expired token", 401);
+
+    if (typeof decoded === "string") {
+      throw new ExpressError("Invalid token payload", 401);
+    }
+
+  } catch (error: unknown) {
+    if (error instanceof JsonWebTokenError) {
+      throw new ExpressError(error.message, 401);
+    }
+
+    throw error;
   }
 
   const tokenHash = hashToken(token);
@@ -121,9 +129,13 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie('refresh_token', { path: '/auth/refresh' });
 
     return res.json({
-      message: "Logged out successfully"
+      success: true
     });
   }
+
+  return res.json({
+    success: false
+  });
 }
 
 export const getMe = async (req: Request, res: Response) => {
