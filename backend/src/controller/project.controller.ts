@@ -1,5 +1,7 @@
 import { Request, Response } from "express"
 import prisma from "../lib/prisma.js";
+import { fastapiURL } from "../constants.js";
+import { ExtractConstraintOutputSchema } from "../schema.js";
 
 export const extractConstraints = async (req: Request, res: Response) => {
   const { userId, rawDescription } = req.body;
@@ -12,31 +14,24 @@ export const extractConstraints = async (req: Request, res: Response) => {
   // TODO: input sanitization
 
   // extract constraints from agent
-  // fastapi call -> 
-  const response = { // demo response structure
-    constraints: {
-      scale: "1M",
-      concurrentTraffic: "~25k"
-    },
-    architectureState: {
-      abc: "abc"
-    },
-    decisions: {
-      abc: "abc"
-    },
-    unresolvedQuestions: [
-      "abc?", "bcd?", "pqr"
-    ]
-  }
+  const response = await fetch(`${fastapiURL}/extract_constraints`, {
+    method: "POST",
+    body: JSON.stringify({ description: rawDescription }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const rawData = await response.json();
+  const data = ExtractConstraintOutputSchema.parse(rawData);
+  console.log(data);
 
   // save agent extracted constraint
   await prisma.project.update({
     where: { id: project.id },
     data: {
-      extractedConstraints: response.constraints,
-      architectureState: response.architectureState,
-      decisions: response.decisions,
-      unreslolvedQuestions: response.unresolvedQuestions
+      extractedConstraints: data.constraints,
+      architectureState: data.architectureState,
+      decisions: data.decisions,
+      unreslolvedQuestions: data.unresolvedQuestions
     }
   });
 
