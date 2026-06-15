@@ -1,7 +1,7 @@
 "use client";
 
-import { getMe } from "@/api";
-import { AuthContextType, AuthProviderProps } from "@/types";
+import { getMe, refresh } from "@/api";
+import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -13,8 +13,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const bootstrapAuth = async () => {
       try {
-        const data = await getMe();
-        setCurrUser(data.user);
+        const data = await refresh();
+        console.log(data);
+        if (data.success) {
+          const userData = await getMe();
+          setCurrUser(userData.user);
+        }
       } catch {
         setCurrUser(null);
       } finally {

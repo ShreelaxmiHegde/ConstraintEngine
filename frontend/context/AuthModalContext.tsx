@@ -1,8 +1,8 @@
 "use client"
 
-import { AuthModalContextType, AuthModalType, AuthProviderProps } from "@/types";
+import { AuthModalContextType, AuthModalType, AuthProviderProps } from "@/types/auth";
 import { createContext, useState } from "react";
-import AuthModal from "@/components/AuthModal";
+import AuthModal from "@/components/auth/AuthModal";
 
 
 export const AuthModalContext = createContext<AuthModalContextType | null>(null);
