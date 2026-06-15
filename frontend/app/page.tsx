@@ -1,57 +1,82 @@
-import AnalysisMetadata from "@/components/AnalysisMetadata";
-import ArchitectureGraph from "@/components/ArchitectureGraph";
-import HistoryPage from "@/components/HistoryPage";
-import ReasoningTrace from "@/components/ReasoningTrace";
-import Workspace from "@/components/Workspace";
-import Navbar from "@/shared/Navbar";
+import Step from "@/components/dashboard/Step";
+import { examples, steps } from "@/contents/dashboard";
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-100">
-      {/* Background Grid */}
-      <div className="fixed inset-0 opacity-[0.04] pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+    <>
+      <section className="max-w-4xl">
+        <p className="text-xs uppercase tracking-[0.25em] text-lime-300">
+          ConstraintEngine
+        </p>
+
+        <h1 className="mt-6 text-5xl md:text-7xl font-semibold tracking-tight leading-none">
+          Constraint-aware <br /> architecture <br /> reasoning.
+        </h1>
+
+        <p className="mt-8 max-w-2xl text-lg leading-8 text-zinc-400">
+          Transform project requirements into
+          structured constraints, architectural
+          decisions and infrastructure strategies.
+        </p>
+      </section>
+
+      <div className="mt-12 rounded-[28px] border border-zinc-900 bg-zinc-950/70 backdrop-blur p-6">
+        <div className="grid md:grid-cols-4 gap-6">
+          {steps.map((step) => (
+            <Step
+              key={step.number}
+              number={step.number}
+              title={step.title}
+              text={step.text}
+            />
+          ))}
+        </div>
       </div>
 
-      <Navbar />
+      <div className="mt-12 rounded-[32px] border border-zinc-900 bg-zinc-950/70 backdrop-blur overflow-hidden">
+        <div className="border-b border-zinc-900 px-6 py-5">
+          <h2 className="font-medium">
+            Describe Your Project
+          </h2>
 
-      {/* Hero + Workspace */}
-      <section className="relative max-w-7xl mx-auto px-6 pt-16 pb-10">
-        <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs text-zinc-400">
-            <div className="h-2 w-2 rounded-full bg-emerald-500" />
-            AI Agent Runtime Operational
-          </div>
-
-          <h1 className="mt-8 text-5xl md:text-7xl font-semibold tracking-tight leading-none">
-            Constraint-aware
-            <br />
-            infrastructure reasoning.
-          </h1>
-
-          <p className="mt-8 max-w-2xl text-lg leading-8 text-zinc-400">
-            Analyze backend workloads, schema design, database selection,
-            indexing strategies and infrastructure tradeoffs through an AI-native
-            systems reasoning engine.
+          <p className="mt-1 text-sm text-zinc-500">
+            Constraint extraction starts here.
           </p>
         </div>
 
-        <Workspace />
-      </section>
+        <div className="p-6">
+          <textarea
+            className="w-full min-h-[180px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none"
+            placeholder="Building ecommerce platform with realtime inventory synchronization, high transactional throughput and analytical reporting..."
+          />
 
-      <section className="relative max-w-7xl mx-auto px-6 pt-16 pb-10">
-        <ArchitectureGraph />
-        <AnalysisMetadata />
-        <ReasoningTrace />
-        <HistoryPage />
-      </section>
-    </div>
-  );
+          <div className="mt-6 flex justify-between items-center">
+            <span className="text-xs text-zinc-600">
+              No account required
+            </span>
+
+            <button className="rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black">
+              Analyze Project
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-12">
+        <p className="text-sm text-zinc-500">
+          Example Workloads
+        </p>
+
+        <div className="mt-4 grid md:grid-cols-2 gap-4">
+          {examples.map((example) => (
+            <button
+              key={example}
+              className="text-left rounded-2xl border border-zinc-900 bg-zinc-950/70 p-5 hover:border-zinc-700 transition">
+              {example}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  )
 }
