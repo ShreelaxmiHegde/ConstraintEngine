@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AuthModalProvider } from "@/context/AuthModalContext";
 import ToastContainer from "@/components/ui/ToastContainer";
+import { AppShell } from "@/components/app-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <AuthModalProvider>
-            {children}
+            <AppShell>
+              {children}
+            </AppShell>
           </AuthModalProvider>
         </AuthProvider>
         <ToastContainer />
