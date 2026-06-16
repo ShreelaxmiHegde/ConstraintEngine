@@ -1,6 +1,6 @@
 "use client";
 
-import { getMe, refresh } from "@/api";
+import { getMe, refresh } from "@/services/auth.service";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { createContext, useEffect, useState } from "react";
 

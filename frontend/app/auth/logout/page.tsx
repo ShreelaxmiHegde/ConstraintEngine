@@ -1,6 +1,6 @@
 "use client";
 
-import { logout } from "@/api";
+import { logout } from "@/services/auth.service";
 import { useAuth } from "@/context/useAuth";
 import { useAuthModal } from "@/context/useAuthModal";
 

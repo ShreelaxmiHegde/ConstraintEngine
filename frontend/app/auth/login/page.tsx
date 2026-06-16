@@ -1,7 +1,7 @@
 "use client"
 
 import { ChangeEvent, useState } from "react"
-import { login } from "@/api";
+import { login } from "@/services/auth.service";
 import { useAuth } from "@/context/useAuth";
 import { useAuthModal } from "@/context/useAuthModal";
 
