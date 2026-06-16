@@ -4,64 +4,9 @@ import DecisionsPanel from "@/components/project/DecisionsPanel";
 import QuestionsPanel from "@/components/project/QuestionsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ConfirmProjectBar from "@/components/project/ConfirmProjectBar";
+import { data } from "@/contents/project";
 
 export default async function Page() {
-  // replace with actual fetch
-
-  const data = {
-    constraints: [
-      {
-        category: "Database",
-        value: "PostgreSQL",
-        source: "User Description",
-        confidence: 0.96,
-      },
-      {
-        category: "Scale",
-        value: "100k concurrent users",
-        source: "User Description",
-        confidence: 0.87,
-      },
-      {
-        category: "Authentication",
-        value: "RBAC",
-        source: "User Description",
-        confidence: 0.91,
-      },
-    ],
-
-    decisions: [
-      {
-        decision:
-          "Use relational database",
-        reason:
-          "Strong transactional consistency required.",
-        confidence: 0.93,
-      },
-    ],
-
-    unresolvedQuestions: [
-      {
-        question:
-          "Expected inventory update rate?",
-        reason:
-          "Impacts caching and replication strategy.",
-      },
-    ],
-
-    architectureState: {
-      frontend: {
-        framework: "Next.js",
-      },
-      backend: {
-        runtime: "Node.js",
-      },
-      database: {
-        engine: "PostgreSQL",
-      },
-    },
-  };
-
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
       <div className="fixed inset-0 opacity-[0.04] pointer-events-none">

@@ -17,7 +17,7 @@ export default function Navbar() {
           <div
             className="flex h-8 w-8 rounded-lg bg-white/10 border items-center justify-center border-white/10">⫷</div>
           <span className="text-lg font-semibold tracking-tight text-white">
-            ConstraintEngine
+            <span className="text-lime-300">Constraint</span>Engine
           </span>
         </div>
 

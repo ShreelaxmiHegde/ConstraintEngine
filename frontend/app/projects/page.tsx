@@ -3,79 +3,9 @@ import ArchitectureWorkspace from "@/components/project/ArchitectureWorkspace";
 import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ArchitectureDiffPanel from "@/components/project/ArchitectureDiffPanel";
 import ProjectReviewHeader from "@/components/project/ProjectReviewHeader";
+import { project, messages, changes } from "@/contents/project";
 
 export default async function Page() {
-  const project = {
-    title: "Ecommerce Platform",
-
-    description:
-      "Building ecommerce system with realtime inventory.",
-
-    constraints: [
-      {
-        category: "Database",
-        value: "PostgreSQL",
-        source: "User Description",
-        confidence: 0.95,
-      },
-      {
-        category: "Authentication",
-        value: "RBAC",
-        source: "User Description",
-        confidence: 0.91,
-      },
-    ],
-
-    architectureState: {
-      frontend: {
-        framework: "Next.js",
-      },
-
-      backend: {
-        runtime: "Node.js",
-        framework: "Express",
-      },
-
-      database: {
-        engine: "PostgreSQL",
-      },
-    },
-  };
-
-  const messages = [
-    {
-      id: "1",
-      role: "user" as const,
-      content:
-        "How should I handle inventory cache invalidation?",
-      createdAt: "",
-    },
-
-    {
-      id: "2",
-      role: "assistant" as const,
-      content:
-        "Introduce Redis with write-through caching.",
-      createdAt: "",
-    },
-  ];
-
-  const changes = [
-    {
-      title: "Redis Cache Added",
-      description:
-        "Recommended write-through cache for inventory reads.",
-      type: "added" as const,
-    },
-
-    {
-      title: "Read Replica Introduced",
-      description:
-        "Analytical workloads separated from primary database.",
-      type: "updated" as const,
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
       <div className="fixed inset-0 opacity-[0.04] pointer-events-none">
