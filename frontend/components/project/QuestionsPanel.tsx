@@ -21,17 +21,17 @@ export default function QuestionsPanel({
       </div>
 
       <div className="p-5 space-y-5">
-        {questions.map((question, index) => (
+        {questions.map((q, index) => (
           <div
             key={index}
             className="rounded-xl border border-zinc-900 bg-black p-4"
           >
             <p className="font-medium">
-              {question.question}
+              {q.question}
             </p>
 
             <p className="mt-2 text-sm text-zinc-500">
-              {question.reason}
+              {q.reason}
             </p>
 
             <textarea

@@ -1,12 +1,19 @@
 import express from 'express';
 import { asyncWrapper } from '../utils/asyncWrapper.js';
-import { extractConstraints, updateConstraints } from '../controller/project.controller.js';
-
+import { createProject, getProject, updateConstraints } from '../controller/project.controller.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.route("/new")
-  .post(asyncWrapper(extractConstraints))
+router.route("/")
+  .post(
+    authenticate,
+    asyncWrapper(createProject)
+  )
   .put(asyncWrapper(updateConstraints))
+  .get(
+    authenticate,
+    asyncWrapper(getProject)
+  )
 
 export default router;

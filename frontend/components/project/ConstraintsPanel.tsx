@@ -1,13 +1,13 @@
 import { Constraint } from "@/types/project";
 
 interface Props {
-  constraints: Constraint[];
+  extractedConstraints: Constraint[];
 }
 
 export default function ConstraintsPanel({
-  constraints,
+  extractedConstraints,
 }: Props) {
-  const grouped = constraints.reduce(
+  const grouped = extractedConstraints.reduce(
     (acc, constraint) => {
       if (!acc[constraint.category]) {
         acc[constraint.category] = [];

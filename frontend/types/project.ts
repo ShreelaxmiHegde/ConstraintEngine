@@ -17,7 +17,16 @@ export interface Question {
 }
 
 export interface ExtractConstraintOutput {
-  constraints: Constraint[];
+  extractedConstraints: Constraint[];
+  architectureState: Record<string, unknown>;
+  decisions: Decision[];
+  unresolvedQuestions: Question[];
+}
+
+export interface ProjectType {
+  title: string;
+  rawDescription: string;
+  extractedConstraints: Constraint[];
   architectureState: Record<string, unknown>;
   decisions: Decision[];
   unresolvedQuestions: Question[];

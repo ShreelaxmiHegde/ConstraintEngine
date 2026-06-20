@@ -1,11 +1,46 @@
+"use client";
+
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import ArchitectureWorkspace from "@/components/project/ArchitectureWorkspace";
 import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ArchitectureDiffPanel from "@/components/project/ArchitectureDiffPanel";
 import ProjectReviewHeader from "@/components/project/ProjectReviewHeader";
-import { project, messages, changes } from "@/contents/project";
+import DecisionsPanel from "@/components/project/DecisionsPanel";
+import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
+import { messages, changes } from "@/contents/project";
+import { useEffect, useState } from "react";
+import { fetchProject } from "@/services/project.service";
+import { ProjectType } from "@/types/project";
 
-export default async function Page() {
+export default function Page() {
+  const [project, setProject] = useState<ProjectType | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProject() {
+      try {
+        const res = await fetchProject();
+        console.log(res);
+        const pro = res.project;
+        setProject(pro); // adjust according to API
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProject();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!project) {
+    return <div>No project found</div>;
+  }
+
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
       <div className="fixed inset-0 opacity-[0.04] pointer-events-none">
@@ -22,21 +57,33 @@ export default async function Page() {
       <main className="relative max-w-7xl mx-auto px-4 py-10">
         <ProjectReviewHeader
           title={project.title}
-          description={project.description}
+          description={project.rawDescription}
         />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-6">
             <ConstraintsPanel
-              constraints={project.constraints}
+              extractedConstraints={project.extractedConstraints}
             />
           </div>
 
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-6">
             <ArchitectureWorkspace
               architectureState={
                 project.architectureState
               }
+            />
+          </div>
+
+          <div className="lg:col-span-6">
+            <DecisionsPanel
+              decisions={project.decisions}
+            />
+          </div>
+
+          <div className="lg:col-span-6">
+            <ArchitectureStatePanel
+              architectureState={project.architectureState}
             />
           </div>
         </div>

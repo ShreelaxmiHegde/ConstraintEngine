@@ -4,7 +4,7 @@ export const project = {
   description:
     "Building ecommerce system with realtime inventory.",
 
-  constraints: [
+  extractedConstraints: [
     {
       category: "Database",
       value: "PostgreSQL",
@@ -70,7 +70,7 @@ export const changes = [
 ];
 
 export const data = {
-  constraints: [
+  extractedConstraints: [
     {
       category: "Database",
       value: "PostgreSQL",

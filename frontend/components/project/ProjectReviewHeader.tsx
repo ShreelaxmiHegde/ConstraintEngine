@@ -14,15 +14,13 @@ export default function ProjectReviewHeader({
           Project Review
         </p>
 
-        <h1 className="mt-3 text-3xl md:text-5xl font-semibold tracking-tight">
+        <h1 className="my-3 text-3xl md:text-3xl font-semibold tracking-tight">
           {title}
         </h1>
 
-        <div className="mt-6 rounded-2xl border border-zinc-900 bg-black p-5">
-          <p className="text-sm leading-7 text-zinc-400">
-            {description}
-          </p>
-        </div>
+        <p className="text-md leading-7 text-zinc-400">
+          <i>{description}</i>
+        </p>
       </div>
     </div>
   );

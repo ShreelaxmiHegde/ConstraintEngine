@@ -4,40 +4,22 @@ import { Request, Response } from "express";
 import { conversationBody } from "../types/types.js";
 import { saveMessage } from "../services/message.service.js";
 import { findOrCreateConversation } from "../services/conversation.service.js";
-import { createProject, updateProjectWithResponse } from "../services/project.service.js";
+import { createProjectInstance, updateProjectWithResponse } from "../services/project.service.js";
 import { fastapiURL } from "../constants.js";
 
-export const extractConstraints = async (req: Request<{}, {}, conversationBody>, res: Response) => {
-  console.log("Request got: ", req.body);
-  const content = req.body.content;
 
-  // create guest user
-  const guest = await prisma.guestSession.create({});
-  const guestId = guest.id;
-  console.log(guest);
+export const startConversation = async (req: Request, res: Response) => {
+  console.log(req.body.prompt);
+  const { prompt, projectId } = req.body.prompt;
+  const userId = req.user?.userId;
 
-  // create project
-  const project = await createProject(guestId, content);
+  // create conversation instance
 
-  const agentResponse = await fetch(`${fastapiURL}/m`, {
-    method: "POST",
-    body: JSON.stringify({ "query": content }),
-    headers: { 'Content-Type': 'application/json' }
-  });
+  // create exchange instance
 
-  const data = await agentResponse.json();
-  console.log(data.response);
+  // send prompt to agent
 
-  const updatedProject = await updateProjectWithResponse(
-    project.id,
-    data.response.architectureState,
-    data.response.architectureState,
-    data.response.decisions
-  );
-
-  return res.json({
-    project: updatedProject
-  });
+  // save agent response in exchange instance
 }
 
 

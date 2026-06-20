@@ -1,7 +1,28 @@
+"use client"
+
+import React, { ChangeEvent, useState } from "react";
 import Step from "@/components/dashboard/Step";
 import { examples, steps } from "@/contents/dashboard";
+import { createProject } from "@/services/project.service";
 
 export default function Page() {
+  const [projectDesc, setProjectDesc] = useState("");
+
+  const handleChange = async (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setProjectDesc(evt.target.value)
+  }
+
+  const handleProjectClick = async (evt: ChangeEvent) => {
+    evt.preventDefault();
+
+    try {
+      const res = await createProject(projectDesc);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <>
       <section className="max-w-4xl">
@@ -45,20 +66,25 @@ export default function Page() {
         </div>
 
         <div className="p-6">
-          <textarea
-            className="w-full min-h-[180px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none"
-            placeholder="Building ecommerce platform with realtime inventory synchronization, high transactional throughput and analytical reporting..."
-          />
+          <form onSubmit={handleProjectClick}>
+            <textarea
+              className="w-full min-h-[180px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none"
+              placeholder="Building ecommerce platform with realtime inventory synchronization, high transactional throughput and analytical reporting..."
+              onChange={handleChange}
+            />
 
-          <div className="mt-6 flex justify-between items-center">
-            <span className="text-xs text-zinc-600">
-              No account required
-            </span>
+            <div className="mt-6 flex justify-between items-center">
+              <span className="text-xs text-zinc-600">
+                No account required
+              </span>
 
-            <button className="rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black">
-              Analyze Project
-            </button>
-          </div>
+              <button
+                className="rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black"
+              >
+                Analyze Project
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
