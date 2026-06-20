@@ -8,6 +8,8 @@ export function errorHandler(
   _next: NextFunction
 ) {
 
+  console.log(err)
+
   return res.status(err.statusCode || 500).json({
     statusCode: err.statusCode,
     message: err.message || "Internal Server Error"
