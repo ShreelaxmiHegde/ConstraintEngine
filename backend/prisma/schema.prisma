@@ -93,8 +93,6 @@ model Exchange {
   queryText    String
   responseText String?
 
-  sequenceNumber Int
-
   exchangeIntent String?
   stateChanged   Boolean @default(false)
 
@@ -102,20 +100,17 @@ model Exchange {
 
   conversation        Conversation         @relation(fields: [conversationId], references: [id])
   architectureVersion ArchitectureVersion? @relation(fields: [architectureVersionId], references: [id])
-
-  @@unique([conversationId, sequenceNumber])
 }
 
 model ArchitectureVersion {
-  id              String  @id @default(uuid()) @db.Uuid
-  projectId       String  @db.Uuid
-  parentVersionId String? @db.Uuid
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @db.Uuid
 
   version Int
 
-  title             String?
   summary           String?
   architectureState Json
+  decisions         Json?
 
   createdAt DateTime @default(now())
 
