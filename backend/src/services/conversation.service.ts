@@ -1,14 +1,14 @@
 import prisma from "../lib/prisma.js";
 
-// export const createConversationInstance = async (
-//   projectId: string
-//   ) => {
-//   const conversation = await prisma.conversation.create({
-//     data: {
+export const createConversationInstance = async (
+  projectId: string
+) => {
+  const conversation = await prisma.conversation.create({
+    data: { projectId: projectId }
+  });
 
-//     }
-//   })
-// }
+  return conversation;
+}
 
 export const findOrCreateConversation = async (conversationId: string | undefined, guestId: string, title: string) => {
   // Existing conversation
@@ -31,4 +31,12 @@ export const findOrCreateConversation = async (conversationId: string | undefine
   });
 
   return newConversation;
+}
+
+export const findById = async (conversationId: string) => {
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId }
+  });
+
+  return conversation;
 }
