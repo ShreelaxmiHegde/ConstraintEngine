@@ -11,12 +11,8 @@ class Decision(BaseModel):
   reason: str
   confidence: float
 
-class Question(BaseModel):
-  question: str
-  reason: str
-
 class ExtractConstraintOutput(BaseModel):
   constraints: list[Constraint]
   architectureState: dict = Field(description="Project state")
   decisions: list[Decision] = Field(description="Derived decisions")
-  unresolvedQuestions: list[Question] = Field(description="Required clarifications")
+  summary: str = Field(description="architecture summary")
