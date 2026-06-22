@@ -1,8 +1,8 @@
 from agno.agent import Agent
 from agno.models.groq import Groq
-from agno.db.sqlite import SqliteDb
 from dotenv import load_dotenv
-from ai_service.schemas.extraction import ExtractConstraintOutput
+from schemas.extraction import ExtractConstraintOutput
+from schemas.architecture import ArchitectureOutput
 
 load_dotenv()
 
@@ -10,15 +10,29 @@ load_dotenv()
 def build_architect_agent():
   return Agent(
     model=Groq(id="qwen/qwen3-32b"),
-    description="You are a Database engineer expert in Database architectural decision making.",
-    instructions=["You should understand the situation, evaluate constraints, compare options, reason about tradeoffs and recommend best fit."],
-    db=SqliteDb(db_file="agent.db"),
-    add_history_to_context=True,
-    num_history_runs=3,
-    enable_user_memories=True,
+    description="""
+      You are a software architecture consultant.
+      Analyze the project context and user query.
+      Respond using the provided output schema.
+    """,
+    instructions=["""
+      Classify the user query as:
+      QUESTION, PROPOSE_CHANGE, ACCEPT_CHANGE, or REJECT_CHANGE.
+
+      QUESTION:
+      - Explain, clarify, compare, or advise.
+      - No architecture changes.
+
+      Architecture Changes:
+      - Only modify architecture when a change is accepted.
+      - Populate changes and newVersion when architecture changes.
+      - architectureState must contain the complete updated architecture state.
+      - Base decisions on project constraints and current architecture.
+      - Do not invent requirements or components.
+    """],
     markdown=True,
-    add_datetime_to_context=True,
-    debug_mode=True
+    debug_mode=True,
+    output_schema=ArchitectureOutput
   )
 
 def build_extraction_agent():

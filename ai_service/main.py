@@ -1,52 +1,54 @@
 from agno.agent import RunOutputEvent, RunEvent
 from typing import Iterator
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 from agent import extractor, architect
-from ai_service.schemas.extraction import ExtractConstraintOutput
+from schemas.extraction import ExtractConstraintOutput
+from schemas.architecture import ArchitectureOutput
+import logging
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
 class Data(BaseModel):
-  query: str
+  query: str 
   user_id: int
   session_id: int
 
 class RawProject(BaseModel):
-  description: str
+  description: str = Field(min_length=10, max_length=500)
 
-@app.post("/extract_constraints")
-def extractConstraints(project: RawProject):
-  print(project.description)
+@app.post("/extract/constraints", response_model=ExtractConstraintOutput)
+async def extract_constraints(project: RawProject):
+  try:
+    logger.info("Constraint extraction request received")
 
-  response = extractor.run(project.description)
-  constraints: ExtractConstraintOutput = response.content
-  print("Model extracted constraints: ", constraints)
+    response = extractor.run(project.description)
 
-  return {constraints}
+    if response.content is None:
+      raise HTTPException(
+        status_code=500,
+        detail="Agent returned empty response"
+      )
 
-@app.post("/m")
-def generateResponse(d: Data):
-  print(d.query, d.user_id)
-  extractor.cli_app(stream=True)
+    return response.content
+
+  except Exception as e:
+    logger.exception("Constraint extraction failed")
+
+    raise HTTPException(
+      status_code=500,
+      detail="Constraint extraction failed"
+    )
+
+ 
+@app.post("/architecture/respond")
+def generateResponse(query):
+  print(query)
   
-  stream: Iterator[RunOutputEvent] = architect.run(
-    d.query, 
-    stream=True, 
-    stream_events=True, 
-    user_id=d.user_id,
-    session_id=d.session_id,
-    debug_mode=True
-  )
+  result = architect.run(query)
 
-  for chunk in stream:
-    if chunk.event == RunEvent.run_content:
-      print(f"Content: {chunk.content}")
-    elif chunk.event == RunEvent.tool_call_started:
-      print(f"Tool call started: {chunk.tool.tool_name}")
-    elif chunk.event == RunEvent.reasoning_step:
-      print(f"Reasoning step: {chunk.reasoning_content}")
+  output: ArchitectureOutput = result.content
 
-  # stream.content - full content
-
-  return {"response": stream}
+  return output
