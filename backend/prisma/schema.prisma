@@ -118,6 +118,8 @@ model ArchitectureVersion {
 
   changes   ArchitectureChange[]
   exchanges Exchange[]
+
+  @@unique([projectId, version])
 }
 
 model ArchitectureChange {
