@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field
 
+class ProjectData(BaseModel):
+  description: str = Field(min_length=10, max_length=500)
+
 class Constraint(BaseModel):
   category: str
   value: str

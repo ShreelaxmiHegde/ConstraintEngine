@@ -13,7 +13,6 @@ def build_architect_agent():
     description="""
       You are a software architecture consultant.
       Analyze the project context and user query.
-      Respond using the provided output schema.
     """,
     instructions=["""
       Classify the user query as:

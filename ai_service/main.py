@@ -1,29 +1,16 @@
-from agno.agent import RunOutputEvent, RunEvent
-from typing import Iterator
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
 from agent import extractor, architect
-from schemas.extraction import ExtractConstraintOutput
-from schemas.architecture import ArchitectureOutput
+from schemas.extraction import ExtractConstraintOutput, ProjectData
+from schemas.architecture import ArchitectureOutput, ArchitectureRequest
 import logging
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-class Data(BaseModel):
-  query: str 
-  user_id: int
-  session_id: int
-
-class RawProject(BaseModel):
-  description: str = Field(min_length=10, max_length=500)
-
-@app.post("/extract/constraints", response_model=ExtractConstraintOutput)
-async def extract_constraints(project: RawProject):
+@app.post("/extract/constraints")
+async def extract_constraints(project: ProjectData):
   try:
-    logger.info("Constraint extraction request received")
-
     response = extractor.run(project.description)
 
     if response.content is None:
@@ -31,8 +18,10 @@ async def extract_constraints(project: RawProject):
         status_code=500,
         detail="Agent returned empty response"
       )
+    
+    output: ExtractConstraintOutput = response.content
 
-    return response.content
+    return output 
 
   except Exception as e:
     logger.exception("Constraint extraction failed")
@@ -44,11 +33,24 @@ async def extract_constraints(project: RawProject):
 
  
 @app.post("/architecture/respond")
-def generateResponse(query):
-  print(query)
-  
-  result = architect.run(query)
+def generateResponse(request: ArchitectureRequest):
+  try:
+    response = architect.run(request.query_context)
 
-  output: ArchitectureOutput = result.content
+    if response.content is None:
+      raise HTTPException(
+        status_code=500,
+        detail="Agent returned empty response"
+      )
 
-  return output
+    output: ArchitectureOutput = response.content
+
+    return output
+
+  except Exception as e:
+    logger.exception("Constraint extraction failed")
+
+    raise HTTPException(
+      status_code=500,
+      detail="Constraint extraction failed"
+    )

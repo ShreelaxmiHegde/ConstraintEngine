@@ -1,5 +1,9 @@
 from pydantic import BaseModel, Field
 from enum import Enum
+from schemas.extraction import Decision
+
+class ArchitectureRequest(BaseModel):
+  query_context: str
 
 class Intent(str, Enum):
   QUESTION = "QUESTION"
@@ -17,12 +21,13 @@ class ChangeType(str, Enum):
 class ArchitectureVersion(BaseModel):
   summary: str = Field(description="new architecture short summary")
   architectureState: dict = Field(description="new architecture state")
+  decisions: list[Decision] = Field(description="Derived decisions")
 
 class ArchitectureChange(BaseModel):
   changeType: ChangeType
   target: str
-  newVal: str | None = None
-  oldVal: str | None = None
+  newVal: dict | None = None
+  oldVal: dict | None = None
   reasoning: str
 
 class Exchange(BaseModel):
