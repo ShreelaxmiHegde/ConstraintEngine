@@ -2,6 +2,7 @@ import { Exchange } from "@prisma/client";
 import prisma from "../lib/prisma.js";
 import { findById, findCurrArchitecture } from "./project.service.js";
 import * as conversationService from "./conversation.service.js";
+import { ExpressError } from "../utils/ExpressError.js";
 
 
 const flattenExchanges = (exchanges: Exchange[]): string => {
@@ -20,7 +21,11 @@ export const createContext = async (
 ) => {
 
   const project = await findById(projectId);
-  const architectureVersion = await findCurrArchitecture(projectId, project?.currentArchitectureVersion);
+  if (!project) throw new ExpressError("No project found", 404);
+
+  const architectureVersion = await findCurrArchitecture(projectId, project.currentArchitectureVersion);
+  if (!architectureVersion) throw new ExpressError("No relevent architecture version data found", 404);
+
   const exchanges = await getExchanges(conversationId);
   const conversation = await conversationService.findById(conversationId);
 
@@ -40,7 +45,7 @@ export const createContext = async (
     )}`,
 
     `DECISIONS:\n${JSON.stringify(
-      project?.decisions,
+      architectureVersion.decisions,
       null,
       2
     )}`,
@@ -65,7 +70,7 @@ export const createContext = async (
 
 export const getExchanges = async (conversationId: string) => {
   const exchanges = await prisma.exchange.findMany({
-    where: { conversationId: conversationId }
+    where: { conversationId }
   });
 
   return exchanges;

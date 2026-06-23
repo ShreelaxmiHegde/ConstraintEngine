@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
-import messageRouter from './routes/conversation.route.js';
+import conversationRouter from './routes/conversation.route.js';
 import authRouter from './routes/auth.route.js';
 import projectRouter from './routes/project.route.js';
 import { errorHandler } from './middleware/error.middleware.js';
@@ -18,7 +18,7 @@ app.use(cors({
 }));
 
 app.use("/auth", authRouter);
-app.use("/m", messageRouter);
+app.use("/ask", conversationRouter);
 app.use("/project", projectRouter);
 
 app.use(errorHandler);

@@ -1,12 +1,12 @@
 import express from "express";
-import { createGuestSession } from "../controller/conversation.controller.js";
+import { startConversation } from "../controller/conversation.controller.js";
 import { asyncWrapper } from "../utils/asyncWrapper.js";
 
 const router = express.Router();
 
 router.route("/")
   .post(
-    asyncWrapper(createGuestSession)
+    asyncWrapper(startConversation)
   )
 
 export default router;

@@ -8,11 +8,11 @@ import { fastapiURL } from "../constants.js";
 import { addExchangeResponse, createExchangeInstance } from "./exchange.controller.js";
 import { createContext } from "../services/exchange.service.js";
 import { ArchitectureOutputSchema } from "../schemas/architect.schema.js";
-import { updateArchitectureChanges } from "../services/project.service.js";
+import { updateArchitectureChanges, updateArchitectureVersion, updateProjectVersion } from "../services/project.service.js";
 
 export const startConversation = async (req: Request, res: Response) => {
   console.log(req.body.prompt);
-  const { prompt, projectId } = req.body.prompt;
+  const { prompt, projectId } = req.body;
 
   // create conversation instance
   const converstation = await createConversationInstance(projectId);
@@ -36,7 +36,7 @@ export const startConversation = async (req: Request, res: Response) => {
 
   const rawData = await response.json();
   const data = ArchitectureOutputSchema.parse(rawData);
-  console.log(data);
+  console.log(data)
 
   // save agent response in exchange instance
   const exchange = await addExchangeResponse(
@@ -44,8 +44,15 @@ export const startConversation = async (req: Request, res: Response) => {
     data.conversation
   );
 
-  if (data.projectModified) {
-    await updateArchitectureChanges(architectureVersionId, data.changes);
+  if (data.projectModified && data.newVersion) {
+    // update ArchitectureVersion
+    const newArchVersion = await updateArchitectureVersion(projectId, data.newVersion);
+
+    // update ArchitectureChange
+    await updateArchitectureChanges(newArchVersion.id, data.changes);
+
+    // update project version
+    await updateProjectVersion(projectId);
   }
 
   return res.status(201).json({

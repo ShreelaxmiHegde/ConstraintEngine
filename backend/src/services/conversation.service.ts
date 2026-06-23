@@ -4,7 +4,7 @@ export const createConversationInstance = async (
   projectId: string
 ) => {
   const conversation = await prisma.conversation.create({
-    data: { projectId: projectId }
+    data: { projectId }
   });
 
   return conversation;
@@ -24,10 +24,7 @@ export const findOrCreateConversation = async (conversationId: string | undefine
 
   // Create new conversation
   const newConversation = await prisma.conversation.create({
-    data: {
-      title: title,
-      guestId: guestId
-    }
+    data: { title, guestId }
   });
 
   return newConversation;

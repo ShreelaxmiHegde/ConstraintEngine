@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import prisma from "../lib/prisma.js";
 import { fastapiURL } from "../constants.js";
-import { ExtractConstraintOutputSchema } from "../schema.js";
+import { ExtractConstraintOutputSchema } from "../schemas/extract.schema.js";
 import { createProjectInstance, fetchProject, saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 
@@ -18,7 +18,7 @@ export const createProject = async (req: Request, res: Response) => {
   // TODO: input sanitization
 
   // extract constraints from agent
-  const response = await fetch(`${fastapiURL}/extract_constraints`, {
+  const response = await fetch(`${fastapiURL}/extract/constraints`, {
     method: "POST",
     body: JSON.stringify({ description: rawDescription }),
     headers: { 'Content-Type': 'application/json' }
