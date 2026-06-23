@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { JsonValueSchema } from "./extract.schema.js";
+import { DecisionSchema, JsonValueSchema } from "./extract.schema.js";
 
 /* Enums */
 const IntentSchema = z.enum([
@@ -21,13 +21,14 @@ const ChangeTypeSchema = z.enum([
 const ArchitectureVersionSchema = z.object({
   summary: z.string(),
   architectureState: z.record(z.string(), JsonValueSchema),
+  decisions: z.array(DecisionSchema)
 });
 
 export const ArchitectureChangeSchema = z.object({
   changeType: ChangeTypeSchema,
   target: z.string(),
-  newVal: z.string().optional(),
-  oldVal: z.string().optional(),
+  newVal: z.record(z.string(), JsonValueSchema).nullable(),
+  oldVal: z.record(z.string(), JsonValueSchema).nullable(),
   reasoning: z.string(),
 });
 
@@ -39,7 +40,7 @@ export const ExchangeSchema = z.object({
 
 export const ArchitectureOutputSchema = z.object({
   changes: z.array(ArchitectureChangeSchema).default([]),
-  newVersion: ArchitectureVersionSchema.nullable().optional(),
+  newVersion: ArchitectureVersionSchema.nullable(),
   conversation: ExchangeSchema,
   projectModified: z.boolean(),
 });
