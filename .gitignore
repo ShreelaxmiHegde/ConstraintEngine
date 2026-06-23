@@ -1,1 +1,17 @@
+# prisma
+/generated/prisma
+agent.db
+
+# environment variables
 .env
+
+# node modules
+node_modules
+
+# Byte-compiled
+__pycache__/
+
+# Distribution / packaging
+.Python
+build/
+dist/
