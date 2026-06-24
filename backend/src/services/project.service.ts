@@ -4,12 +4,12 @@ import { ExpressError } from "../utils/ExpressError.js";
 import * as archVersion from "./architectureVersion.service.js"
 
 export const createInstance = async (
-  userId: string,
+  ownerId: string,
   rawDescription: string
 ) => {
   const project = await prisma.project.create({
     data: {
-      userId,
+      ownerId,
       rawDescription
     }
   });
@@ -37,9 +37,9 @@ export const saveConstraints = async (
   return;
 }
 
-export const fetchAll = async (userId: string) => {
+export const fetchAll = async (ownerId: string) => {
   const project = await prisma.project.findMany({
-    where: { userId }
+    where: { ownerId }
   });
 
   return project;

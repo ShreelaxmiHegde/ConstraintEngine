@@ -20,7 +20,7 @@ import * as refreshSession from "../services/auth.service.js";
 
 export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
   console.log("Signup Request: ", req.body);
-  const { username, email, password } = req.body;
+  const { username, email, password, guestId } = req.body;
 
   const userExist = await user.findByEmail(email);
   if (userExist) throw new ExpressError("An account with this email already exist", 409);
@@ -28,7 +28,13 @@ export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) =>
   const saltRounds = 10;
   const passwordHash = bcrypt.hashSync(password, saltRounds);
 
-  const userData = await user.create(username, email, passwordHash);
+  let userData;
+
+  if (guestId) {
+    userData = await user.convertToUser(guestId, username, email, password);
+  } else {
+    userData = await user.create(username, email, passwordHash);
+  }
 
   // auto-login
   const accessToken = signAccessToken(userData);

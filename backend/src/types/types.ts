@@ -7,6 +7,7 @@ export type SignUpBody = {
   username: string
   email: string
   password: string
+  guestId: string | null
 }
 
 export type LoginBody = {

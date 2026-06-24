@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { fastapiURL } from "../constants.js";
 import { ExtractConstraintOutputSchema } from "../schemas/extract.schema.js";
 import * as project from "../services/project.service.js";
+import * as user from "../services/user.service.js";
 import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 
@@ -10,10 +11,17 @@ export const createProject = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   console.log(rawDescription, userId);
 
-  if (!(typeof userId === "string")) throw new ExpressError("Invalid user ID", 401);
+  let ownerId = userId;
+
+  if (!userId) {
+    const guestUser = await user.createGuest();
+    ownerId = guestUser.id;
+  }
+
+  if (!(typeof ownerId === "string")) throw new ExpressError("Invalid user ID", 401);
 
   // save raw data
-  const projectData = await project.createInstance(userId, rawDescription);
+  const projectData = await project.createInstance(ownerId, rawDescription);
 
   // TODO: input sanitization
 
@@ -37,7 +45,7 @@ export const createProject = async (req: Request, res: Response) => {
   });
 }
 
-export const getProjects = async (req: Request, res: Response) => {
+export const getProjectsData = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
   console.log(user);
