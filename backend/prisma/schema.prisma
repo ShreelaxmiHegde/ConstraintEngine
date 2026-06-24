@@ -15,21 +15,13 @@ model User {
 
   createdAt DateTime @default(now())
 
-  guestsession GuestSession[]
-  projects     Project[]
   refreshtoken RefreshSession[]
 }
 
-model GuestSession {
-  id     String  @id @default(uuid()) @db.Uuid
-  userId String? @db.Uuid
+model GuestIdentity {
+  id String @id @default(uuid()) @db.Uuid
 
   createdAt DateTime @default(now())
-  expiresAt DateTime
-
-  user User? @relation(fields: [userId], references: [id])
-
-  projects Project[]
 }
 
 model RefreshSession {
@@ -50,9 +42,8 @@ model RefreshSession {
 }
 
 model Project {
-  id             String  @id @default(uuid()) @db.Uuid
-  userId         String? @db.Uuid
-  guestSessionId String? @db.Uuid
+  id      String @id @default(uuid()) @db.Uuid
+  ownerId String @db.Uuid
 
   title                String?
   rawDescription       String
@@ -62,9 +53,6 @@ model Project {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
-
-  user         User?         @relation(fields: [userId], references: [id])
-  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
 
   conversations        Conversation[]
   architectureVersions ArchitectureVersion[]
