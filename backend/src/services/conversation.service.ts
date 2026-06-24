@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-export const createConversationInstance = async (
+export const createInstance = async (
   projectId: string
 ) => {
   const conversation = await prisma.conversation.create({
@@ -10,7 +10,7 @@ export const createConversationInstance = async (
   return conversation;
 }
 
-export const findOrCreateConversation = async (conversationId: string | undefined, guestId: string, title: string) => {
+export const findOrCreate = async (conversationId: string | undefined, guestId: string, title: string) => {
   // Existing conversation
   if (conversationId) {
     const existingConversation = await prisma.conversation.findUnique({

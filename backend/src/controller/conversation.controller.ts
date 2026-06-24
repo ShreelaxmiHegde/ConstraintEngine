@@ -3,29 +3,32 @@ import prisma from "../lib/prisma.js";
 import { Request, Response } from "express";
 import { conversationBody } from "../types/types.js";
 import { saveMessage } from "../services/exchange.service.js";
-import { createConversationInstance, findOrCreateConversation } from "../services/conversation.service.js";
+import * as conversation from "../services/conversation.service.js";
 import { fastapiURL } from "../constants.js";
 import { addExchangeResponse, createExchangeInstance } from "./exchange.controller.js";
 import { createContext } from "../services/exchange.service.js";
 import { ArchitectureOutputSchema } from "../schemas/architect.schema.js";
 import { updateArchitectureChanges, updateArchitectureVersion, updateProjectVersion } from "../services/project.service.js";
 
-export const startConversation = async (req: Request, res: Response) => {
+export const findOrCreateConversation = async (req: Request, res: Response) => {
   console.log(req.body.prompt);
-  const { prompt, projectId } = req.body;
+  let { prompt, projectId, conversationId } = req.body;
 
-  // create conversation instance
-  const converstation = await createConversationInstance(projectId);
+  if (!conversationId) {
+    // create conversation instance
+    const convData = await conversation.createInstance(projectId);
+    conversationId = convData.id;
+  }
 
   // generate context
   const context = await createContext(
     projectId,
-    converstation.id,
+    conversationId,
     prompt
   );
 
   // create exchange instance
-  const exchangeInstance = await createExchangeInstance(converstation.id, prompt);
+  const exchangeInstance = await createExchangeInstance(conversationId, prompt);
 
   // send prompt to agent
   const response = await fetch(`${fastapiURL}/architecture/respond`, {
@@ -36,7 +39,7 @@ export const startConversation = async (req: Request, res: Response) => {
 
   const rawData = await response.json();
   const data = ArchitectureOutputSchema.parse(rawData);
-  console.log(data)
+  console.log(data);
 
   // save agent response in exchange instance
   const exchange = await addExchangeResponse(
@@ -73,8 +76,8 @@ export const createGuestSession = async (req: Request<{}, {}, conversationBody>,
   console.log(guest);
 
   // create conversation
-  const conversation = await findOrCreateConversation(undefined, guestId, title)
-  const conversationId = conversation.id;
+  const convData = await conversation.findOrCreate(undefined, guestId, title)
+  const conversationId = convData.id;
   console.log(conversation);
 
   // store query/message in that convo
