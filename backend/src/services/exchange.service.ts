@@ -1,8 +1,10 @@
 import { Exchange } from "@prisma/client";
 import prisma from "../lib/prisma.js";
-import { findById, findCurrArchitecture } from "./project.service.js";
+import { findById } from "./project.service.js";
 import * as conversationService from "./conversation.service.js";
+import * as archVersion from "./architectureVersion.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
+import * as schema from "../schemas/architect.schema.js";
 
 
 const flattenExchanges = (exchanges: Exchange[]): string => {
@@ -23,7 +25,7 @@ export const createContext = async (
   const project = await findById(projectId);
   if (!project) throw new ExpressError("No project found", 404);
 
-  const architectureVersion = await findCurrArchitecture(projectId, project.currentArchitectureVersion);
+  const architectureVersion = await archVersion.findCurrArchitecture(projectId, project.currentArchitectureVersion);
   if (!architectureVersion) throw new ExpressError("No relevent architecture version data found", 404);
 
   const exchanges = await getExchanges(conversationId);
@@ -68,9 +70,50 @@ export const createContext = async (
   return sections.join("\n\n");
 };
 
+export const createInstance = async (
+  conversationId: string,
+  queryText: string
+) => {
+  const exchangeData = await prisma.exchange.create({
+    data: {
+      conversationId: conversationId,
+      queryText: queryText
+    }
+  });
+
+  return exchangeData;
+}
+
 export const getExchanges = async (conversationId: string) => {
   const exchanges = await prisma.exchange.findMany({
     where: { conversationId }
+  });
+
+  return exchanges;
+}
+
+export const addResponse = async (
+  exchangeId: string,
+  exchange: schema.Exchange
+) => {
+  const exchangeData = await prisma.exchange.update({
+    where: { id: exchangeId },
+    data: {
+      responseText: exchange.responseText,
+      exchangeIntent: exchange.exchangeIntent,
+      stateChanged: exchange.stateChanged
+    }
+  });
+
+  return exchangeData;
+}
+
+export const getByDescOrder = async (
+  conversationId: string
+) => {
+  const exchanges = await prisma.exchange.findMany({
+    where: { conversationId: conversationId },
+    orderBy: { createdAt: 'desc' }
   });
 
   return exchanges;

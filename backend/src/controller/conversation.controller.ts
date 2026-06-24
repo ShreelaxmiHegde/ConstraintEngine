@@ -5,10 +5,12 @@ import { conversationBody } from "../types/types.js";
 import { saveMessage } from "../services/exchange.service.js";
 import * as conversation from "../services/conversation.service.js";
 import { fastapiURL } from "../constants.js";
-import { addExchangeResponse, createExchangeInstance } from "./exchange.controller.js";
 import { createContext } from "../services/exchange.service.js";
 import { ArchitectureOutputSchema } from "../schemas/architect.schema.js";
-import { updateArchitectureChanges, updateArchitectureVersion, updateProjectVersion } from "../services/project.service.js";
+import * as archVersion from "../services/architectureVersion.service.js";
+import * as archChange from "../services/architectureChange.service.js";
+import * as project from "../services/project.service.js";
+import * as exchange from "../services/exchange.service.js";
 
 export const findOrCreateConversation = async (req: Request, res: Response) => {
   console.log(req.body.prompt);
@@ -28,7 +30,7 @@ export const findOrCreateConversation = async (req: Request, res: Response) => {
   );
 
   // create exchange instance
-  const exchangeInstance = await createExchangeInstance(conversationId, prompt);
+  const exchangeInstance = await exchange.createInstance(conversationId, prompt);
 
   // send prompt to agent
   const response = await fetch(`${fastapiURL}/architecture/respond`, {
@@ -42,25 +44,25 @@ export const findOrCreateConversation = async (req: Request, res: Response) => {
   console.log(data);
 
   // save agent response in exchange instance
-  const exchange = await addExchangeResponse(
+  const exchangeData = await exchange.addResponse(
     exchangeInstance.id,
     data.conversation
   );
 
   if (data.projectModified && data.newVersion) {
     // update ArchitectureVersion
-    const newArchVersion = await updateArchitectureVersion(projectId, data.newVersion);
+    const newArchVersion = await archVersion.createNew(projectId, data.newVersion);
 
     // update ArchitectureChange
-    await updateArchitectureChanges(newArchVersion.id, data.changes);
+    await archChange.createManyChanges(newArchVersion.id, data.changes);
 
     // update project version
-    await updateProjectVersion(projectId);
+    await project.updateVersion(projectId);
   }
 
   return res.status(201).json({
     success: true,
-    response: exchange.responseText
+    response: exchangeData.responseText
   });
 }
 

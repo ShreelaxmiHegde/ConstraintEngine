@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import prisma from "../lib/prisma.js";
 import { fastapiURL } from "../constants.js";
 import { ExtractConstraintOutputSchema } from "../schemas/extract.schema.js";
-import { createProjectInstance, fetchProject, saveConstraints } from "../services/project.service.js";
+import * as project from "../services/project.service.js";
+import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 
 export const createProject = async (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ export const createProject = async (req: Request, res: Response) => {
   if (!(typeof userId === "string")) throw new ExpressError("Invalid user ID", 401);
 
   // save raw data
-  const project = await createProjectInstance(userId, rawDescription);
+  const projectData = await project.createInstance(userId, rawDescription);
 
   // TODO: input sanitization
 
@@ -29,7 +29,7 @@ export const createProject = async (req: Request, res: Response) => {
   console.log(data);
 
   // save agent extracted constraint
-  await saveConstraints(project.id, data);
+  await saveConstraints(projectData.id, data);
 
   return res.status(201).json({
     constraints: data,
@@ -37,31 +37,17 @@ export const createProject = async (req: Request, res: Response) => {
   });
 }
 
-export const updateConstraints = async (req: Request, res: Response) => {
-  const { projectId, constraintUpdates } = req.body;
-
-  await prisma.project.update({
-    where: { id: projectId },
-    data: {
-      extractedConstraints: constraintUpdates
-    }
-  });
-
-  return res.json({
-    success: true
-  });
-}
-
-export const getProject = async (req: Request, res: Response) => {
+export const getProjects = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
+  console.log(user);
 
-  const project = await fetchProject(user?.userId);
-  if (!project) throw new ExpressError("No content", 404);
+  const projects = await project.fetchAll(user?.userId);
+  if (!projects) throw new ExpressError("No content", 404);
 
-  console.log(project);
+  console.log(projects);
   return res.status(200).json({
     success: true,
-    project: project
+    projects
   });
 }
