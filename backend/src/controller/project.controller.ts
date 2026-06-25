@@ -45,7 +45,7 @@ export const createProject = async (req: Request, res: Response) => {
   });
 }
 
-export const getProjectsData = async (req: Request, res: Response) => {
+export const getProjects = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
   console.log(user);
@@ -57,5 +57,27 @@ export const getProjectsData = async (req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
     projects
+  });
+}
+
+export const getProjectData = async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) throw new ExpressError("Unauthorized access", 401);
+
+  console.log(req.params);
+  const [projectId] = req.params.projectId;
+  console.log(projectId);
+
+  const data = await project.fetchAllIn(projectId);
+  if (!data) throw new ExpressError("No project found", 404);
+
+  return res.status(201).json({
+    project: {
+      desc: data.rawDescription,
+      constraints: data.extractedConstraints,
+      version: data.currentArchitectureVersion
+    },
+    exchanges: data.conversations,
+    archVersions: data.architectureVersions,
   });
 }

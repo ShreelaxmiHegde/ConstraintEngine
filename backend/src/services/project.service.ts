@@ -65,5 +65,52 @@ export const updateVersion = async (projectId: string) => {
       currentArchitectureVersion: newVersion,
       updatedAt: new Date()
     }
-  })
+  });
+
+  return;
+}
+
+export const fetchAllIn = async (projectId: string) => {
+  const data = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: {
+      rawDescription: true,
+      extractedConstraints: true,
+      currentArchitectureVersion: true,
+
+      conversations: {
+        select: {
+          exchanges: {
+            select: {
+              queryText: true,
+              responseText: true
+            }
+          }
+        }
+      },
+
+      architectureVersions: {
+        orderBy: { createdAt: 'desc' },
+
+        select: {
+          version: true,
+          summary: true,
+          architectureState: true,
+          decisions: true,
+
+          changes: {
+            select: {
+              changeType: true,
+              target: true,
+              newValue: true,
+              oldValue: true,
+              reasoning: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return data;
 }
