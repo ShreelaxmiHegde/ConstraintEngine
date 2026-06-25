@@ -10,7 +10,20 @@ import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel"
 import { messages, changes } from "@/contents/project";
 import { useEffect, useState } from "react";
 import { fetchProject } from "@/services/project.service";
-import { ProjectType } from "@/types/project";
+// import { ProjectType } from "@/types/project";
+
+interface Constraint {
+  category: string;
+  value: string;
+  source: string;
+  confidence: number;
+}
+
+interface ProjectType {
+  title: string;
+  rawDescription: string;
+  extractedConstraints: Constraint[];
+}
 
 export default function Page() {
   const [project, setProject] = useState<ProjectType | null>(null);
@@ -20,9 +33,10 @@ export default function Page() {
     async function loadProject() {
       try {
         const res = await fetchProject();
-        console.log(res);
-        const pro = res.project;
+        console.log(res)
+        const pro = res.projects[0];
         setProject(pro); // adjust according to API
+        console.log(project);
       } catch (err) {
         console.error(err);
       } finally {
@@ -67,7 +81,7 @@ export default function Page() {
             />
           </div>
 
-          <div className="lg:col-span-6">
+          {/* <div className="lg:col-span-6">
             <ArchitectureWorkspace
               architectureState={
                 project.architectureState
@@ -85,7 +99,7 @@ export default function Page() {
             <ArchitectureStatePanel
               architectureState={project.architectureState}
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-12">

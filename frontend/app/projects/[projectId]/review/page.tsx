@@ -3,7 +3,6 @@
 import ProjectReviewHeader from "@/components/project/ProjectReviewHeader";
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import DecisionsPanel from "@/components/project/DecisionsPanel";
-import QuestionsPanel from "@/components/project/QuestionsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ConfirmProjectBar from "@/components/project/ConfirmProjectBar";
 import { useEffect, useState } from "react";
@@ -71,12 +70,6 @@ export default function Page() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-6">
-            {/* <QuestionsPanel
-              questions={project.unresolvedQuestions}
-            /> */}
-          </div>
-
           <div className="lg:col-span-6">
             <ArchitectureStatePanel
               architectureState={project.architectureState}
