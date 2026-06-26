@@ -1,3 +1,5 @@
+input_data = "Yes, proceed with adding Redis."
+
 accept_change_data = {
   "changes": [
     {

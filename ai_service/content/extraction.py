@@ -1,3 +1,5 @@
+input_data = "Build an AI-powered system design assistant for developers. Must support chat conversations, architecture versioning, PostgreSQL storage, and future scaling"
+
 extraction_data = {
   "constraints": [
     {

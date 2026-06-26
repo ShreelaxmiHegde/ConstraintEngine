@@ -1,3 +1,5 @@
+input_data = "Let's add Redis caching."
+
 propose_change_data = {
   "changes": [
     {

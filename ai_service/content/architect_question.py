@@ -1,3 +1,5 @@
+input_data = "Why did we choose PostgreSQL?"
+
 question_data = {
   "changes": [],
   "newVersion": None,

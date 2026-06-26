@@ -1,4 +1,6 @@
-reject_data = {
+input_data = "Let's replace PostgreSQL with local JSON files."
+
+reject_change_data = {
   "changes": [],
   "newVersion": None,
   "conversation": {
