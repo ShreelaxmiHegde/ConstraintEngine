@@ -8,7 +8,7 @@ import JsonTree from "./JsonTree";
 interface Decision {
   decision: string,
   reason: string,
-  confidence: string
+  confidence: number
 }
 
 interface Version {
