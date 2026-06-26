@@ -11,10 +11,13 @@ import * as archVersion from "../services/architectureVersion.service.js";
 import * as archChange from "../services/architectureChange.service.js";
 import * as project from "../services/project.service.js";
 import * as exchange from "../services/exchange.service.js";
+import { ExpressError } from "../utils/ExpressError.js";
 
 export const findOrCreateConversation = async (req: Request, res: Response) => {
   console.log(req.body.prompt);
   let { prompt, projectId, conversationId } = req.body;
+
+  if (!conversationId) throw new ExpressError("no conversationid provided", 403); //temporary
 
   if (!conversationId) {
     // create conversation instance

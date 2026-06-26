@@ -54,13 +54,13 @@ model Project {
   createdAt DateTime  @default(now())
   updatedAt DateTime?
 
-  conversations        Conversation[]
+  conversation         Conversation?
   architectureVersions ArchitectureVersion[]
 }
 
 model Conversation {
   id        String @id @default(uuid()) @db.Uuid
-  projectId String @db.Uuid
+  projectId String @unique @db.Uuid
 
   title           String?
   contextSnapshot Json?
