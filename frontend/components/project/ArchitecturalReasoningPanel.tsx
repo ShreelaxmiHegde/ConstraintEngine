@@ -1,8 +1,4 @@
-interface Decision {
-  decision: string,
-  reason: string,
-  confidence: number
-}
+import { Decision } from "@/types/project";
 
 interface ArchitecturalReasoningPanelProps {
   decisions: Decision[];
@@ -12,27 +8,15 @@ export default function ArchitecturalReasoningPanel({
   decisions,
 }: ArchitecturalReasoningPanelProps) {
   return (
-    <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-100">
-            Architectural Reasoning
-          </h2>
+    <section className="rounded-xl border border-zinc-800 bg-black p-6 my-5">
+      <div>
+        <h2 className="text-lg font-semibold text-zinc-100">
+          Architectural Reasoning
+        </h2>
 
-          <p className="mt-1 text-sm text-zinc-500">
-            AI-generated architectural decisions and their rationale.
-          </p>
-        </div>
-
-        <div className="rounded-md border border-zinc-800 px-3 py-2">
-          <p className="text-xs text-zinc-500">
-            Decisions
-          </p>
-
-          <p className="font-medium text-zinc-100">
-            {decisions.length}
-          </p>
-        </div>
+        <p className="mt-1 text-sm text-zinc-500">
+          AI-generated architectural decisions and their rationale.
+        </p>
       </div>
 
       <div className="mt-6 space-y-4">

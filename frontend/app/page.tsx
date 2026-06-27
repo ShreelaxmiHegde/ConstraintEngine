@@ -1,12 +1,17 @@
 "use client"
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Step from "@/components/dashboard/Step";
 import { examples, steps } from "@/contents/dashboard";
-import { createProject } from "@/services/project.service";
+import { createProject, fetchAllProjects } from "@/services/project.service";
+import { useAuth } from "@/context/useAuth";
+import { ProjectType } from "@/types/project";
+import { ExternalLink } from "lucide-react";
 
 export default function Page() {
   const [projectDesc, setProjectDesc] = useState("");
+  const [projects, setProjects] = useState<ProjectType[] | null>();
+  const { currUser } = useAuth();
 
   const handleChange = async (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     setProjectDesc(evt.target.value)
@@ -22,6 +27,20 @@ export default function Page() {
       console.log(err);
     }
   }
+
+  useEffect(() => {
+    async function getProjects() {
+      try {
+        const res = await fetchAllProjects();
+        console.log(res.projects);
+        setProjects(res.projects);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getProjects();
+  }, []);
 
   return (
     <>
@@ -52,6 +71,31 @@ export default function Page() {
             />
           ))}
         </div>
+
+        <br />
+        {/* <hr /> */}
+
+        {(currUser && projects) && (
+          <div className="border-t border-zinc-900">
+            <h2 className="font-medium text-zinc-300 my-3">
+              Your Projects
+            </h2>
+
+            <div>
+              {projects?.map((project, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-2"
+                >
+                  <span className="text-xs">{idx + 1} {"."} </span>
+                  <p className="cursor-pointer underline text-sky-500 text-xs gap-r-2"
+                  >{project.id}</p>
+                  <ExternalLink size={18} className="text-sky-500" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-12 rounded-[32px] border border-zinc-900 bg-zinc-950/70 backdrop-blur overflow-hidden">

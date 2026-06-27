@@ -1,33 +1,50 @@
 export interface Constraint {
-  category: string;
-  value: string;
-  source: string;
-  confidence: number;
+  value: string
+  source: string
+  category: string
+  confidence: number
+}
+
+interface Project {
+  constraints: Constraint[]
+  desc: string
+  version: number
+}
+
+interface Change {
+  changeType: string
+  target: string
+  newVal: Record<string, unknown>
+  oldVal: Record<string, unknown>
+  reasoning: string
 }
 
 export interface Decision {
-  decision: string;
-  reason: string;
-  confidence: number;
+  reason: string
+  decision: string
+  confidence: number
 }
 
-export interface Question {
-  question: string;
-  reason: string;
+export interface ArchitectureVersion {
+  architectureState: Record<string, unknown>
+  summary: string
+  version: number
+  changes: Change[]
+  decisions: Decision[]
 }
 
-export interface ExtractConstraintOutput {
-  extractedConstraints: Constraint[];
-  architectureState: Record<string, unknown>;
-  decisions: Decision[];
-  unresolvedQuestions: Question[];
+export interface Exchange {
+  queryText: string
+  responseText: string
+}
+
+interface Conversation {
+  exchanges: Exchange[]
 }
 
 export interface ProjectType {
-  title: string;
-  rawDescription: string;
-  extractedConstraints: Constraint[];
-  architectureState: Record<string, unknown>;
-  decisions: Decision[];
-  unresolvedQuestions: Question[];
+  id: string
+  project: Project
+  archVersions: ArchitectureVersion[]
+  conversation: Conversation
 }

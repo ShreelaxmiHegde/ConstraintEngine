@@ -78,7 +78,7 @@ export const fetchAllIn = async (projectId: string) => {
       extractedConstraints: true,
       currentArchitectureVersion: true,
 
-      conversations: {
+      conversation: {
         select: {
           exchanges: {
             select: {

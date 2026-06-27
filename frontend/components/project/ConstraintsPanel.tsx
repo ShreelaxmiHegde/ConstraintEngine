@@ -1,63 +1,73 @@
 import { Constraint } from "@/types/project";
 
-interface Props {
-  extractedConstraints: Constraint[];
+interface ConstraintsPanelProps {
+  constraints: Constraint[];
 }
 
 export default function ConstraintsPanel({
-  extractedConstraints,
-}: Props) {
-  const grouped = extractedConstraints.reduce(
-    (acc, constraint) => {
-      if (!acc[constraint.category]) {
-        acc[constraint.category] = [];
-      }
+  constraints,
+}: ConstraintsPanelProps) {
+  const groupedConstraints = constraints.reduce<
+    Record<string, Constraint[]>
+  >((acc, constraint) => {
+    if (!acc[constraint.category]) {
+      acc[constraint.category] = [];
+    }
 
-      acc[constraint.category].push(constraint);
+    acc[constraint.category].push(constraint);
 
-      return acc;
-    },
-    {} as Record<string, Constraint[]>
-  );
+    return acc;
+  }, {});
 
   return (
-    <div className="rounded-[28px] border border-zinc-900 bg-zinc-950/70">
-      <div className="border-b border-zinc-900 p-5">
-        <h2 className="font-medium">
+    <section className="rounded-xl border border-zinc-800 bg-black p-6">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-zinc-100">
           Extracted Constraints
         </h2>
+
+        <p className="mt-1 text-sm text-zinc-500">
+          {constraints.length} extracted constraints
+        </p>
       </div>
 
-      <div className="p-5 space-y-6">
-        {Object.entries(grouped).map(([category, items]) => (
-          <div key={category}>
-            <h3 className="text-sm font-medium text-lime-300">
-              {category}
-            </h3>
+      <div className="space-y-6">
+        {Object.entries(groupedConstraints).map(
+          ([category, categoryConstraints]) => (
+            <div key={category}>
+              <h3 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-400">
+                {category}
+              </h3>
 
-            <div className="mt-3 space-y-3">
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  className="rounded-xl border border-zinc-900 bg-black p-4"
-                >
-                  <p className="text-sm">
-                    {item.value}
-                  </p>
+              <div className="space-y-3">
+                {categoryConstraints.map((constraint, index) => (
+                  <div
+                    key={index}
+                    className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3"
+                  >
+                    <p className="text-sm text-zinc-100">
+                      {constraint.value}
+                    </p>
 
-                  <div className="mt-2 flex items-center justify-between text-xs text-zinc-500">
-                    <span>{item.source}</span>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-xs text-zinc-500">
+                        Confidence
+                      </span>
 
-                    <span>
-                      {(item.confidence * 100).toFixed(0)}%
-                    </span>
+                      <span className="text-xs font-medium text-zinc-300">
+                        {Math.round(
+                          constraint.confidence * 100
+                        )}
+                        %
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        )}
       </div>
-    </div>
+    </section>
   );
 }

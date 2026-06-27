@@ -1,148 +1,81 @@
-import ArchitectureStatePanel from "./dump/ArchitectureStatePanel";
-import ConstraintsPanel from "./dump/ConstraintsPanel";
-import ProjectHeader from "./dump/ProjectHeader";
+"use client"
 
+import { useEffect, useState } from "react";
+import { fetchProject } from "@/services/project.service";
+import { ProjectType } from "@/types/project";
+import RawVersion from "@/components/project/RawVersions";
+import ProjectHeader from "@/components/project/ProjectHeader";
+import DiscussionPanel from "@/components/project/DiscussionPanel";
+import ConstraintsPanel from "@/components/project/ConstraintsPanel";
+import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
+import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
 
-interface Constraints {
-  category: string,
-  value: string,
-  confidence: number
-}
-
-interface Decision {
-  decision: string,
-  reason: string,
-  confidence: string
-}
-
-interface Exchange {
-  query: string,
-  response: string
-}
-
-interface Project {
-  desc: string,
-  version: number
-}
-
-interface Version {
-  summary: string,
-  architectureState: Record<string, unknown>,
-  decisions: Decision[],
-}
-
-const constraints = [
-  {
-    "category": "Database",
-    "value": "Use PostgreSQL as primary datastore",
-    "confidence": 0.97
-  },
-  {
-    "category": "Feature",
-    "value": "Support architecture versioning",
-    "confidence": 0.95
-  },
-  {
-    "category": "Scalability",
-    "value": "Architecture should support future scaling",
-    "confidence": 0.88
-  }
-];
-
-const exchanges = [
-  {
-    query: "lorem ipsum",
-    response: "dolor sit amet"
-  },
-  {
-    query: "lorem ipsum",
-    response: "dolor sit amet"
-  },
-  {
-    query: "lorem ipsum",
-    response: "dolor sit amet"
-  },
-]
-
-const archState = {
-  "database": "PostgreSQL",
-  "backend": "Node.js",
-}
-
-const decisions = [
-  {
-    decision: "Use PostgreSQL for persistence",
-    reason: "Relational data and version tracking fit well",
-    confidence: 0.94
-  },
-  {
-    decision: "Maintain architecture state separately from conversations",
-    reason: "Enables version history and rollback",
-    confidence: 0.91
-  }
-]
-
-const project = {
-  desc: "abc",
-  version: 1
-}
-
-const architectureVersion = {
-  summary: "string"
-}
-
-const currVersion = {
-  version: 2,
-  decisions: decisions,
-  summary: "lorem epsum dolor sit amet",
-  architectureState: archState
-}
 
 export default function Page() {
+  const [project, setProject] = useState<ProjectType | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const projectId = "46892039-6c80-4fa3-aa7e-7266e49481d0";
+
+  const countDecision = project?.archVersions.reduce(
+    (count, version) => count + version.decisions.length,
+    0
+  ) ?? 0;
+
+  useEffect(() => {
+    async function loadProject() {
+      try {
+        const res = await fetchProject(projectId);
+        console.log(res);
+        setProject(res);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProject();
+  }, []);
+
   return (
     <>
-      <ProjectHeader
-        description={"project description"}
-        currentVersion={2}
-        constraintCount={3}
-        decisionCount={24}
-        exchangeCount={4}
-      />
-
-      <div className="grid grid-cols-12">
-        <div className="col-span-5">
-          <ConstraintsPanel
-            constraints={constraints}
+      {(!loading && project) &&
+        (<>
+          <ProjectHeader
+            description={project.project.desc}
+            currentVersion={project.project.version}
+            constraintCount={project.project.constraints.length}
+            decisionCount={countDecision}
           />
-        </div>
 
-        <div className="col-span-5">
-          <ArchitectureStatePanel
-            currVersion={currVersion}
-          />
-          <div>
-            {decisions.map((d, idx) => (
-              <div key={idx}>
-                <p>Decision: {d.decision}</p>
-                <p>Reason: {d.reason}</p>
-                <p>Confidence: {d.confidence}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h1>Discussion</h1>
-        <div>
-          {exchanges.map((e, idx) => (
-            <div key={idx}>
-              <p>Query: {e.query}</p>
-              <p>Response: {e.response}</p>
+          <div className="grid lg:grid-cols-12 gap-4 my-5">
+            <div className="col-span-6">
+              <ArchitectureStatePanel
+                currVersion={project.archVersions[0]}
+              />
+              <DiscussionPanel exchanges={project.conversation.exchanges} />
             </div>
-          ))}
-        </div>
-      </div>
+
+            <div className="col-span-6">
+              <ConstraintsPanel
+                constraints={project.project.constraints}
+              />
+              <ArchitecturalReasoningPanel
+                decisions={project.archVersions[0].decisions}
+              />
+              <RawVersion versions={project.archVersions} />
+            </div>
+          </div>
+        </>)
+      }
+
+      {
+        loading && (
+          <h1>loading...</h1>
+        )
+      }
+
     </>
   )
 }

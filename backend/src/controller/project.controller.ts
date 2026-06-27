@@ -64,9 +64,8 @@ export const getProjectData = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
 
-  console.log(req.params);
-  const [projectId] = req.params.projectId;
-  console.log(projectId);
+  const projectId = req.params.id;
+  if (!(typeof projectId === "string")) throw new ExpressError("No project found.", 404);
 
   const data = await project.fetchAllIn(projectId);
   if (!data) throw new ExpressError("No project found", 404);
@@ -77,7 +76,7 @@ export const getProjectData = async (req: Request, res: Response) => {
       constraints: data.extractedConstraints,
       version: data.currentArchitectureVersion
     },
-    exchanges: data.conversations,
+    conversation: data.conversation,
     archVersions: data.architectureVersions,
   });
 }
