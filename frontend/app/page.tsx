@@ -7,6 +7,8 @@ import { createProject, fetchAllProjects } from "@/services/project.service";
 import { useAuth } from "@/context/useAuth";
 import { ProjectType } from "@/types/project";
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+
 
 export default function Page() {
   const [projectDesc, setProjectDesc] = useState("");
@@ -61,7 +63,7 @@ export default function Page() {
       </section>
 
       <div className="mt-12 rounded-[28px] border border-zinc-900 bg-zinc-950/70 backdrop-blur p-6">
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-4 gap-6 mb-4">
           {steps.map((step) => (
             <Step
               key={step.number}
@@ -72,9 +74,6 @@ export default function Page() {
           ))}
         </div>
 
-        <br />
-        {/* <hr /> */}
-
         {(currUser && projects) && (
           <div className="border-t border-zinc-900">
             <h2 className="font-medium text-zinc-300 my-3">
@@ -83,14 +82,14 @@ export default function Page() {
 
             <div>
               {projects?.map((project, idx) => (
-                <div
-                  key={idx}
-                  className="flex gap-2"
-                >
+                <div key={idx} className="flex gap-1">
                   <span className="text-xs">{idx + 1} {"."} </span>
-                  <p className="cursor-pointer underline text-sky-500 text-xs gap-r-2"
-                  >{project.id}</p>
-                  <ExternalLink size={18} className="text-sky-500" />
+                  <Link href={`/projects/${project.id}`} className="flex gap-2">
+                    <p className="cursor-pointer underline text-sky-500 text-xs gap-r-2">
+                      {project.id}
+                    </p>
+                    <ExternalLink size={18} className="text-sky-500" />
+                  </Link>
                 </div>
               ))}
             </div>
