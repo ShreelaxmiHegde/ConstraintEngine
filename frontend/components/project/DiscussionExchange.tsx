@@ -1,15 +1,18 @@
-interface Exchange {
-  queryText: string,
-  responseText: string
-}
+"use client"
 
-interface Props {
-  exchange: Exchange;
+import { useEffect, useState } from "react";
+import { getResponse } from "@/services/conversation";
+import { UiExchange } from "@/types/conversation";
+import ResponseLoader from "../ui/ResponseLoader";
+
+interface DiscussionExchangeProps {
+  exchange: UiExchange
 }
 
 export default function DiscussionExchange({
-  exchange,
-}: Props) {
+  exchange
+}: DiscussionExchangeProps) {
+
   return (
     <div className="space-y-4">
       {/* User */}
@@ -24,9 +27,13 @@ export default function DiscussionExchange({
 
       <div className="flex justify-start">
         <div className="max-w-[85%] rounded-3xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-          <p className="text-sm leading-7 text-zinc-200">
-            {exchange.responseText}
-          </p>
+          {exchange.status === "pending" ? (
+            <ResponseLoader />
+          ) : (
+            <p className="text-sm leading-7 text-zinc-200">
+              {exchange.responseText}
+            </p>
+          )}
         </div>
       </div>
     </div>
