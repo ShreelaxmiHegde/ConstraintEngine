@@ -1,6 +1,6 @@
 import api from "@/lib/axios"
 
-export const startConversation = async (prompt: string) => {
-  const res = await api.post("/conversation", { prompt });
+export const getResponse = async (prompt: string) => {
+  const res = await api.post("/ask", { prompt });
   return res.data;
 }
