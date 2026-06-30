@@ -9,6 +9,7 @@ import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
+import { UiExchange } from "@/types/conversation";
 
 
 export default function Page() {
@@ -23,12 +24,14 @@ export default function Page() {
   ) ?? 0;
 
   function transformExchanges(exchanges: Exchange[]) {
-    return exchanges.map(exchange => ({
+    const transformedExchanges: UiExchange[] = exchanges.map(exchange => ({
       ...exchange,
       id: crypto.randomUUID(),
       status: "completed"
     }
     ));
+
+    return transformedExchanges;
   }
 
   useEffect(() => {
