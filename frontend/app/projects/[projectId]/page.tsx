@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchProject } from "@/services/project.service";
-import { ProjectType } from "@/types/project";
+import { Exchange, ProjectType } from "@/types/project";
 import RawVersion from "@/components/project/RawVersions";
 import ProjectHeader from "@/components/project/ProjectHeader";
 import DiscussionPanel from "@/components/project/DiscussionPanel";
@@ -21,6 +21,15 @@ export default function Page() {
     (count, version) => count + version.decisions.length,
     0
   ) ?? 0;
+
+  function transformExchanges(exchanges: Exchange[]) {
+    return exchanges.map(exchange => ({
+      ...exchange,
+      id: crypto.randomUUID(),
+      status: "completed"
+    }
+    ));
+  }
 
   useEffect(() => {
     async function loadProject() {
@@ -54,7 +63,7 @@ export default function Page() {
               <ArchitectureStatePanel
                 currVersion={project.archVersions[0]}
               />
-              <DiscussionPanel exchanges={project.conversation.exchanges} />
+              <DiscussionPanel exchanges={transformExchanges(project.conversation.exchanges)} />
             </div>
 
             <div className="col-span-6">
