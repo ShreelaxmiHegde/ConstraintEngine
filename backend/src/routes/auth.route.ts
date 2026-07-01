@@ -1,11 +1,23 @@
 import express from "express";
 import { asyncWrapper } from "../utils/asyncWrapper.js";
 import { getMe, login, logout, refresh, signUp } from "../controller/auth.controller.js";
+import { validateBody } from "../middleware/validateBody.middleware.js";
+import { LoginSchema, SignUpSchema } from "../schemas/auth.schema.js";
 
 const router = express.Router();
 
-router.route("/signup").post(asyncWrapper(signUp));
-router.route("/login").post(asyncWrapper(login));
+router.route("/signup")
+  .post(
+    asyncWrapper(validateBody(SignUpSchema)),
+    asyncWrapper(signUp)
+  );
+
+router.route("/login")
+  .post(
+    asyncWrapper(validateBody(LoginSchema)),
+    asyncWrapper(login)
+  );
+
 router.route("/refresh").post(asyncWrapper(refresh));
 router.route("/logout").post(asyncWrapper(logout));
 router.route("/me").get(asyncWrapper(getMe));
