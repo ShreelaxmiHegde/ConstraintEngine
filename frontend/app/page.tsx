@@ -113,6 +113,8 @@ export default function Page() {
             <textarea
               className="w-full min-h-[180px] resize-none rounded-3xl border border-zinc-900 bg-black px-5 py-5 text-sm leading-8 outline-none"
               placeholder="Building ecommerce platform with realtime inventory synchronization, high transactional throughput and analytical reporting..."
+              minLength={20}
+              maxLength={5000}
               onChange={handleChange}
             />
 
