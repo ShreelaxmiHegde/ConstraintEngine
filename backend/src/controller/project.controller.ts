@@ -5,8 +5,9 @@ import * as project from "../services/project.service.js";
 import * as user from "../services/user.service.js";
 import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
+import { ProjectInputBody } from "../schemas/classifier.schema.js";
 
-export const createProject = async (req: Request, res: Response) => {
+export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res: Response) => {
   const { rawDescription } = req.body;
   const userId = req.user?.userId;
   console.log(rawDescription, userId);

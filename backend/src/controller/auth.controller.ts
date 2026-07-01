@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { AuthPayload, LoginBody, SignUpBody } from "../types/types.js";
+import { AuthPayload } from "../types/types.js";
+import { SignUpBody, LoginBody } from "../schemas/auth.schema.js";
 import * as user from "../services/user.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 import { JWT_SECRET, REFRESH_TOKEN_SECRET } from "../constants.js";
