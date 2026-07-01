@@ -59,6 +59,8 @@ export default function Signup() {
             type="text"
             name="username"
             placeholder="Enter username"
+            minLength={3}
+            maxLength={15}
             onChange={handleChange}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 outline-none transition focus:border-zinc-600"
           />
@@ -71,6 +73,8 @@ export default function Signup() {
             type="email"
             name="email"
             placeholder="Enter email"
+            minLength={10}
+            maxLength={30}
             onChange={handleChange}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 outline-none transition focus:border-zinc-600"
           />
@@ -84,6 +88,8 @@ export default function Signup() {
             type="password"
             name="password"
             placeholder="Enter password"
+            minLength={3}
+            maxLength={10}
             onChange={handleChange}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 outline-none transition focus:border-zinc-600"
           />

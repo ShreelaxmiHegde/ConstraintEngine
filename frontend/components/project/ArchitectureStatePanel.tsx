@@ -1,23 +1,6 @@
 import { ArchitectureVersion } from "@/types/project";
 import JsonTree from "./JsonTree";
 
-// interface ArchitectureStatePanelProps {
-//   architectureVersion: ArchitectureVersion;
-// }
-
-// interface Decision {
-//   decision: string,
-//   reason: string,
-//   confidence: number
-// }
-
-// interface Version {
-//   summary: string,
-//   architectureState: Record<string, unknown>,
-//   decisions: Decision[],
-//   version: number
-// }
-
 interface ArchitectureStatePanelProps {
   currVersion: ArchitectureVersion
 }

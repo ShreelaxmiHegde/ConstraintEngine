@@ -60,6 +60,8 @@ export default function Page() {
             name="email"
             placeholder="Enter email"
             onChange={handleChange}
+            minLength={10}
+            maxLength={30}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 outline-none transition focus:border-zinc-600"
           />
         </div>
@@ -73,6 +75,8 @@ export default function Page() {
             name="password"
             placeholder="Enter password"
             onChange={handleChange}
+            minLength={3}
+            maxLength={10}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 outline-none transition focus:border-zinc-600"
           />
         </div>

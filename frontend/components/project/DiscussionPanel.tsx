@@ -70,6 +70,8 @@ export default function DiscussionPanel({
             value={exchange}
             placeholder="Ask about scalability, deployment, databases, messaging..."
             className="w-full resize-none rounded-2xl border border-zinc-800 bg-black p-4 text-sm outline-none"
+            minLength={1}
+            maxLength={300}
             onChange={handleChange}
           />
 
