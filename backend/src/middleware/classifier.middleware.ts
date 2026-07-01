@@ -68,16 +68,43 @@ export const promptIntentClassifier = async (req: Request<{}, {}, PromptInputBod
       {
         role: "system",
         content: `
-          You are an intent classifier.
-          Determine whether the user's message is describing a software project that they want to build.
-          Return JSON only.
+          You are a conversation intent classifier for an AI software architecture assistant.
+          Your task is to classify the prompt into exactly ONE of the following intents.
+          Return ONLY valid JSON matching this schema:
+
+          {"intent": "architecture" | "follow_up" | "acknowledgement" | "feedback" | "gratitude" | "other"}
+
+          Intent definitions:
+
+          - architecture
+            The user is asking about software architecture, system design, technologies, implementation details, requesting architectural analysis, or proposing architectural changes.=
+
+          - follow_up
+            The user wants the previous discussion to continue, clarify, elaborate, summarize, or expand without introducing a new architecture topic.
+
+          - acknowledgement
+            The user acknowledges the previous response but does not ask a new question.
+
+          - feedback
+            The user agrees, disagrees, corrects, or critiques the previous response.
+
+          - gratitude
+            The user is expressing thanks or appreciation.
+
+          - other
+            Anything unrelated to the architecture conversation or that cannot be confidently classified into the above categories.
+            Examples:
+            - "How to make lemonade?"
+            - "What's the weather?"
+            - "Tell me a joke."
+            - "I like cars."
+            - Random unrelated conversation.
 
           Rules:
-          - Greetings -> false
-          - General questions -> false
-          - Casual conversation -> false
-          - Random text -> false
-          - Software project descriptions -> true
+          - Classify ONLY the latest user message.
+          - Do not infer hidden intentions.
+          - Do not answer the user's question.
+          - Do not generate explanations.
         `
       },
       {
@@ -98,13 +125,19 @@ export const promptIntentClassifier = async (req: Request<{}, {}, PromptInputBod
 
   if (result.intent === "acknowledgement") {
     return res.status(201).json({
-      response: ""
+      response: "Glad to hear that.🙂"
     });
   }
 
   if (result.intent === "gratitude") {
     return res.status(201).json({
-      response: "Glad to hear that."
+      response: "Happy to help.😊"
+    });
+  }
+
+  if (result.intent === "other") {
+    return res.status(201).json({
+      response: "That doesn't appear to be related to our architecture discussion. If you'd like help with your project's architecture, describe the component or design decision you'd like to explore."
     })
   }
 
