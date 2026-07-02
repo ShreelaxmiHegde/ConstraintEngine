@@ -11,11 +11,11 @@ const router = express.Router();
 
 router.route("/")
   .post(
-    // asyncWrapper(validateBody(PromptClassifierSchema)),
+    asyncWrapper(validateBody(PromptClassifierSchema)),
     asyncWrapper(sanitizePromptInput),
-    // asyncWrapper(promptIntentClassifier),
+    asyncWrapper(promptIntentClassifier),
     asyncWrapper(promptRateLimiter),
-    // asyncWrapper(findOrCreateConversation)
+    asyncWrapper(findOrCreateConversation)
   )
 
 export default router;
