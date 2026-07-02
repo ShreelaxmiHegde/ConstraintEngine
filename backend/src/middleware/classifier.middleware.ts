@@ -1,11 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import { ProjectClassifierSchema, ProjectInputBody, PromptClassifierSchema, PromptInputBody } from "../schemas/classifier.schema.js";
-import { NextFunction, Request, response, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import "dotenv/config";
 import { ExpressError } from "../utils/ExpressError.js";
 
 
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const projectIntentClassifier = async (req: Request<{}, {}, ProjectInputBody>, res: Response, next: NextFunction) => {
   const userInput = req.body.rawDescription;
@@ -77,7 +77,7 @@ export const promptIntentClassifier = async (req: Request<{}, {}, PromptInputBod
           Intent definitions:
 
           - architecture
-            The user is asking about software architecture, system design, technologies, implementation details, requesting architectural analysis, or proposing architectural changes.=
+            The user is asking about software architecture, system design, technologies, implementation details, requesting architectural analysis, or proposing architectural changes.
 
           - follow_up
             The user wants the previous discussion to continue, clarify, elaborate, summarize, or expand without introducing a new architecture topic.
