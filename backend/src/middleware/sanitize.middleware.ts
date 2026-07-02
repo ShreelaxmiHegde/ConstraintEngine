@@ -17,7 +17,7 @@ export const sanitizeProjectInput = (req: Request<{}, {}, ProjectInputBody>, res
   let result = validateLength(normalize(inputText), 20, 5000);
   if (!result.passed) return res.status(400).json(result);
 
-  result = validateWordCount(normalize(inputText), 10, 10);
+  result = validateWordCount(normalize(inputText), 10, 100);
   if (!result.passed) return res.status(400).json(result);
 
   result = validateCode(normalize(inputText));
@@ -30,9 +30,6 @@ export const sanitizePromptInput = (req: Request<{}, {}, PromptInputBody>, res: 
   const prompt = req.body.prompt;
 
   let result = validateLength(normalize(prompt), 1, 300);
-  if (!result.passed) return res.status(400).json(result);
-
-  result = validateWordCount(normalize(prompt), 10, 300);
   if (!result.passed) return res.status(400).json(result);
 
   result = validateCode(normalize(prompt));
