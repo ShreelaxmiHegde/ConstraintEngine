@@ -36,7 +36,9 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       (
         originalReq.url === "/auth/me" ||
-        originalReq.url === "/auth/refresh"
+        originalReq.url === "/auth/refresh" ||
+        originalReq.url === "/auth/login" ||
+        originalReq.url === "/auth/signup"
       )
     ) {
       return Promise.reject(error);
@@ -51,6 +53,8 @@ api.interceptors.response.use(
       } catch {
         await logout();
       }
+
+      return Promise.reject(error);
     }
 
     // only log error if its not auth and retried
