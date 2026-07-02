@@ -6,6 +6,7 @@ import { sanitizeProjectInput } from '../middleware/sanitize.middleware.js';
 import { validateBody } from '../middleware/validateBody.middleware.js';
 import { ProjectInputSchema } from '../schemas/classifier.schema.js';
 import { projectIntentClassifier } from '../middleware/classifier.middleware.js';
+import { projectRateLimiter } from '../middleware/rateLimiter.middleware.js';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.route("/")
     asyncWrapper(validateBody(ProjectInputSchema)),
     asyncWrapper(sanitizeProjectInput),
     asyncWrapper(projectIntentClassifier),
+    asyncWrapper(projectRateLimiter),
     asyncWrapper(createProject)
   )
   .get(
