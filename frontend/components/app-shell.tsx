@@ -1,4 +1,5 @@
 import Navbar from "@/components/dashboard/Navbar";
+import Footer from "./dashboard/Footer";
 
 export function AppShell({
   children,
@@ -21,6 +22,7 @@ export function AppShell({
         <Navbar />
         {children}
       </div>
+      <Footer />
     </div>
   );
 }
