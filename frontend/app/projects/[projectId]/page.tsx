@@ -11,12 +11,13 @@ import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel"
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
 import { UiExchange } from "@/types/conversation";
 
+type PageProps = {
+  params: Promise<{ projectId: string }>
+}
 
-export default function Page() {
+export default function Page({ params }: PageProps) {
   const [project, setProject] = useState<ProjectType | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const projectId = "46892039-6c80-4fa3-aa7e-7266e49481d0";
 
   const countDecision = project?.archVersions.reduce(
     (count, version) => count + version.decisions.length,
@@ -37,8 +38,9 @@ export default function Page() {
   useEffect(() => {
     async function loadProject() {
       try {
+        const { projectId } = await params;
         const res = await fetchProject(projectId);
-        console.log(res);
+
         setProject(res);
       } catch (err) {
         console.error(err);
@@ -48,7 +50,7 @@ export default function Page() {
     }
 
     loadProject();
-  }, []);
+  }, [params]);
 
   return (
     <>
