@@ -9,6 +9,8 @@ import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 type PageProps = {
   params: Promise<{ projectId: string }>
@@ -72,11 +74,19 @@ export default function Page({ params }: PageProps) {
         </>)
       }
 
-      {
-        loading && (
-          <h1>loading...</h1>
-        )
-      }
+      {loading && (
+        <div className="flex min-h-screen justify-center items-center">
+          <div className="flex-col">
+            <h1 className="mb-4 animate-pulse text-lg text-lime-500">LOADING PROJECT...</h1>
+            <div className="text-sky-500">
+              <Link href="/" className="flex gap-2" >
+                <h1 className="cursor-pointer underline text-sky-500 text-md gap-r-2">GO BACK TO HOME</h1>
+                <ExternalLink />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
     </>
   )
