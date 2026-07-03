@@ -1,10 +1,3 @@
-export const examples = [
-  "Multi-tenant SaaS CRM",
-  "Realtime Chat Platform",
-  "AI Inference API",
-  "Analytics Pipeline",
-];
-
 export const steps = [
   {
     number: "01",
