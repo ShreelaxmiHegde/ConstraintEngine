@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { fetchProject } from "@/services/project.service";
-import { Exchange, ProjectType } from "@/types/project";
+import { ProjectType } from "@/types/project";
 import RawVersion from "@/components/project/RawVersions";
 import ProjectHeader from "@/components/project/ProjectHeader";
 import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
-import { UiExchange } from "@/types/conversation";
 
 type PageProps = {
   params: Promise<{ projectId: string }>
@@ -23,17 +22,6 @@ export default function Page({ params }: PageProps) {
     (count, version) => count + version.decisions.length,
     0
   ) ?? 0;
-
-  function transformExchanges(exchanges: Exchange[]) {
-    const transformedExchanges: UiExchange[] = exchanges.map(exchange => ({
-      ...exchange,
-      id: crypto.randomUUID(),
-      status: "completed"
-    }
-    ));
-
-    return transformedExchanges;
-  }
 
   useEffect(() => {
     async function loadProject() {
@@ -68,7 +56,7 @@ export default function Page({ params }: PageProps) {
               <ArchitectureStatePanel
                 currVersion={project.archVersions[0]}
               />
-              <DiscussionPanel exchanges={transformExchanges(project.conversation.exchanges)} />
+              <DiscussionPanel exchanges={project.conversation.exchanges} />
             </div>
 
             <div className="col-span-6">

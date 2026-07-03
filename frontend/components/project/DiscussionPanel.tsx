@@ -1,51 +1,46 @@
 "use client"
 
-import React, { ChangeEvent, useState } from "react";
+import axios from "axios";
+import { ChangeEvent, useState } from "react";
 import Discussions from "./Discussions";
-import { UiExchange } from "@/types/conversation";
+import { Exchange } from "@/types/project";
 import { getResponse } from "@/services/conversation";
 
 interface DiscussionPanelProps {
-  exchanges: UiExchange[];
+  exchanges: Exchange[];
 }
 
 export default function DiscussionPanel({
   exchanges,
 }: DiscussionPanelProps) {
   const [exchange, setExchange] = useState("");
-  const [uiExchanges, setUiExchanges] = useState<UiExchange[] | []>(exchanges);
-
-  const handleChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setExchange(evt.target.value);
-  }
+  const [uiExchanges, setUiExchanges] = useState<Exchange[]>(exchanges);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleExchangeClick = async (evt: ChangeEvent) => {
     evt.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+
     try {
-      const newExchange: UiExchange = {
-        id: crypto.randomUUID(),
-        queryText: exchange,
-        responseText: "",
-        status: "pending"
-      }
-
-      exchanges.push(newExchange);
-      setUiExchanges(exchanges);
-      setExchange("");
-
       const res = await getResponse(exchange);
-      const updatedExchanges: UiExchange[] = exchanges.map((e) =>
-        e.id === newExchange.id ? {
-          ...newExchange,
-          responseText: res.response,
-          status: "completed"
-        } : e
-      );
-      setUiExchanges(updatedExchanges);
+      const newExchange: Exchange = {
+        queryText: exchange,
+        responseText: res.response,
+      };
+
+      setUiExchanges((prev => [...prev, newExchange]));
+      setExchange("");
 
       return;
     } catch (err) {
-      console.log(err);
+      if (axios.isAxiosError(err)) {
+        console.log(err.response?.data);
+        setError(err.response?.data.message);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -72,14 +67,25 @@ export default function DiscussionPanel({
             className="w-full resize-none rounded-2xl border border-zinc-800 bg-black p-4 text-sm outline-none"
             minLength={1}
             maxLength={300}
-            onChange={handleChange}
+            onChange={(e) => setExchange(e.target.value)}
+            disabled={isSubmitting}
           />
 
-          <button
-            className="mt-4 rounded-xl bg-lime-300 px-5 py-3 text-sm font-medium text-black cursor-pointer"
-          >
-            Send
-          </button>
+          <div className="flex gap-2 item-center justify-between mt-4 ">
+            {isSubmitting && (
+              <p className="animate-pulse text-lime-400">Validating your message...</p>
+            )}
+            {error && (
+              <p className="text-red-600"><i>{"> "}{error}</i></p>
+            )}
+            <button
+              className={isSubmitting || exchange.trim() === "" ? "rounded-xl px-5 py-3 text-sm font-medium bg-zinc-700 cursor-not-allowed"
+                : "rounded-xl bg-lime-300 px-5 py-3 text-sm font-medium text-black cursor-pointer"}
+              disabled={isSubmitting || exchange.trim() === ""}
+            >
+              Send
+            </button>
+          </div>
         </form>
       </div>
     </section>

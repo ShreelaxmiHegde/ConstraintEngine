@@ -1,9 +1,9 @@
 import DiscussionExchange from "./DiscussionExchange";
 import { useEffect, useRef } from "react";
-import { UiExchange } from "@/types/conversation";
+import { Exchange } from "@/types/project";
 
 interface DiscussionPanelProps {
-  exchanges: UiExchange[];
+  exchanges: Exchange[];
 }
 
 export default function Discussions({

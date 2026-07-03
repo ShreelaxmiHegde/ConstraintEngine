@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const bootstrapAuth = async () => {
       try {
         const data = await refresh();
-        console.log(data);
+
         if (data.success) {
           const userData = await getMe();
           setCurrUser(userData.user);
