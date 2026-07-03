@@ -2,18 +2,22 @@
 
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Step from "@/components/dashboard/Step";
-import { examples, steps } from "@/contents/dashboard";
+import { steps } from "@/contents/dashboard";
 import { createProject, fetchAllProjects } from "@/services/project.service";
 import { useAuth } from "@/context/useAuth";
 import { ProjectType } from "@/types/project";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Page() {
   const [projectDesc, setProjectDesc] = useState("");
   const [projects, setProjects] = useState<ProjectType[] | null>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const { currUser } = useAuth();
+  const router = useRouter();
 
   const handleChange = async (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     setProjectDesc(evt.target.value)
@@ -21,12 +25,20 @@ export default function Page() {
 
   const handleProjectClick = async (evt: ChangeEvent) => {
     evt.preventDefault();
+    setIsSubmitting(true);
+    setError("");
 
     try {
       const res = await createProject(projectDesc);
       console.log(res);
+      router.push(`/projects/${res.projectId}`);
     } catch (err) {
-      console.log(err);
+      if (axios.isAxiosError(err)) {
+        console.log(err.response?.data);
+        setError(err.response?.data.message);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -74,7 +86,7 @@ export default function Page() {
           ))}
         </div>
 
-        {(currUser && projects) && (
+        {(currUser && (projects?.length != 0)) && (
           <div className="border-t border-zinc-900">
             <h2 className="font-medium text-zinc-300 my-3">
               Your Projects
@@ -98,14 +110,19 @@ export default function Page() {
       </div>
 
       <div className="mt-12 rounded-[32px] border border-zinc-900 bg-zinc-950/70 backdrop-blur overflow-hidden">
-        <div className="border-b border-zinc-900 px-6 py-5">
-          <h2 className="font-medium">
-            Describe Your Project
-          </h2>
+        <div className="flex justify-between border-b border-zinc-900 px-6 py-5">
+          <div>
+            <h2 className="font-medium">
+              Describe Your Project
+            </h2>
 
-          <p className="mt-1 text-sm text-zinc-500">
-            Constraint extraction starts here.
-          </p>
+            <p className="mt-1 text-sm text-zinc-500">
+              Constraint extraction starts here.
+            </p>
+          </div>
+          <span className="text-xs text-zinc-600">
+            No account required
+          </span>
         </div>
 
         <div className="p-6">
@@ -116,36 +133,24 @@ export default function Page() {
               minLength={20}
               maxLength={5000}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
 
-            <div className="mt-6 flex justify-between items-center">
-              <span className="text-xs text-zinc-600">
-                No account required
-              </span>
-
+            <div className="flex gap-2 item-center justify-between mt-4">
               <button
-                className="rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black"
+                className={isSubmitting || projectDesc.trim() === "" ? "rounded-2xl px-6 py-3 text-sm font-medium bg-zinc-700 cursor-not-allowed" : "rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black"}
               >
                 Analyze Project
               </button>
+
+              {isSubmitting && (
+                <p className="animate-pulse text-lime-400">Validating your message...</p>
+              )}
+              {error && (
+                <p className="text-red-600"><i>{"> "}{error}</i></p>
+              )}
             </div>
           </form>
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <p className="text-sm text-zinc-500">
-          Example Workloads
-        </p>
-
-        <div className="mt-4 grid md:grid-cols-2 gap-4">
-          {examples.map((example) => (
-            <button
-              key={example}
-              className="text-left rounded-2xl border border-zinc-900 bg-zinc-950/70 p-5 hover:border-zinc-700 transition">
-              {example}
-            </button>
-          ))}
         </div>
       </div>
     </>
