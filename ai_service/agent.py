@@ -1,5 +1,5 @@
 from agno.agent import Agent
-from agno.models.groq import Groq
+from agno.models.google import Gemini
 from dotenv import load_dotenv
 from schemas.extraction import ExtractConstraintOutput
 from schemas.architecture import ArchitectureOutput
@@ -9,7 +9,7 @@ load_dotenv()
 
 def build_architect_agent():
   return Agent(
-    model=Groq(id="qwen/qwen3-32b"),
+    model=Gemini(id="gemini-2.5-flash"),
     description="""
       You are a software architecture consultant.
       Analyze the project context and user query.
@@ -36,7 +36,7 @@ def build_architect_agent():
 
 def build_extraction_agent():
   return Agent(
-    model=Groq(id="qwen/qwen3-32b"),
+    model=Gemini(id="gemini-2.5-flash"),
     description="Extract requirements from software project descriptions.",
     instructions="""
       Extract:
