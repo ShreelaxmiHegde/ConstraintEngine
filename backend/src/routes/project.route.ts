@@ -12,11 +12,10 @@ const router = express.Router();
 
 router.route("/")
   .post(
-    authenticate,
     asyncWrapper(validateBody(ProjectInputSchema)),
     asyncWrapper(sanitizeProjectInput),
-    asyncWrapper(projectIntentClassifier),
     asyncWrapper(projectRateLimiter),
+    asyncWrapper(projectIntentClassifier),
     asyncWrapper(createProject)
   )
   .get(
