@@ -6,12 +6,17 @@ import * as user from "../services/user.service.js";
 import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 import { ProjectInputBody } from "../schemas/classifier.schema.js";
+import { verifyToken } from "../utils/token.js";
+
 
 export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res: Response) => {
   const { rawDescription } = req.body;
-  const userId = req.user?.userId;
-  console.log(rawDescription, userId);
 
+  if (req.cookies?.access_token) {
+    verifyToken(req, req.cookies?.access_token);
+  }
+
+  const userId = req.user?.userId;
   let ownerId = userId;
 
   if (!userId) {
@@ -23,8 +28,6 @@ export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res:
 
   // save raw data
   const projectData = await project.createInstance(ownerId, rawDescription);
-
-  // TODO: input sanitization
 
   // extract constraints from agent
   const response = await fetch(`${fastapiURL}/extract/constraints`, {
@@ -41,7 +44,7 @@ export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res:
   await saveConstraints(projectData.id, data);
 
   return res.status(201).json({
-    constraints: data,
+    projectId: projectData.id,
     message: "Project created successfully"
   });
 }
