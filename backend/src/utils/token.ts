@@ -14,6 +14,8 @@ import {
   NODE_ENV
 } from "../constants.js";
 import * as refreshSession from "../services/auth.service.js";
+import { AuthPayload } from "../types/types.js";
+
 
 export const setAccessCookie = (res: Response, token: string) => {
   res.cookie("access_token", token, {
@@ -121,4 +123,28 @@ export const rotateRefreshToken = async (oldSessionId: string, userId: string, r
   setRefreshCookie(res, newRefresh);
 
   return { accessToken: newAccess };
+}
+
+export const verifyToken = (req: Request, token: string) => {
+  if (!JWT_SECRET) throw new ExpressError("Missing JWT secret", 500);
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+
+    if (typeof decoded === "string") {
+      console.log("ERROR LOG: Invalid token payload");
+      throw new ExpressError("Unauthorized access", 401);
+    }
+
+    req.user = decoded as AuthPayload;
+
+  } catch (error: unknown) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      console.log(`ERROR LOG: ${error.message}`, error);
+      throw new ExpressError("Unauthorized access", 401);
+    }
+    console.log("ERROR LOG: Invalid token", error);
+    throw new ExpressError("Unauthorized access", 401);
+  }
 }
