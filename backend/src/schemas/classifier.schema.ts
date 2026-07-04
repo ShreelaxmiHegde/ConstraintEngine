@@ -9,15 +9,7 @@ export const PromptInputSchema = z.object({
 });
 
 export const ProjectClassifierSchema = z.object({
-  inDomain: z.boolean(),
-  reason: z.enum([
-    "project_description",
-    "greeting",
-    "general_question",
-    "casual_chat",
-    "random_text",
-    "unclear"
-  ])
+  inDomain: z.boolean()
 });
 
 export const PromptClassifierSchema = z.object({
