@@ -1,7 +1,7 @@
 "use client"
 
 import axios from "axios";
-import { ChangeEvent, useState } from "react";
+import { SubmitEvent, useState } from "react";
 import Discussions from "./Discussions";
 import { Exchange } from "@/types/project";
 import { getResponse } from "@/services/conversation";
@@ -18,8 +18,9 @@ export default function DiscussionPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const handleExchangeClick = async (evt: ChangeEvent) => {
+  const handleExchangeClick = async (evt: SubmitEvent) => {
     evt.preventDefault();
+    if (isSubmitting) return; // overcome double click race condition
     setIsSubmitting(true);
     setError("");
 

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { SubmitEvent, useEffect, useState } from "react";
 import Step from "@/components/dashboard/Step";
 import { steps } from "@/contents/dashboard";
 import { createProject, fetchAllProjects } from "@/services/project.service";
@@ -19,12 +19,9 @@ export default function Page() {
   const { currUser } = useAuth();
   const router = useRouter();
 
-  const handleChange = async (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setProjectDesc(evt.target.value)
-  }
-
-  const handleProjectClick = async (evt: ChangeEvent) => {
+  const handleProjectClick = async (evt: SubmitEvent) => {
     evt.preventDefault();
+    if (isSubmitting) return; // overcome double click race condition
     setIsSubmitting(true);
     setError("");
 
@@ -132,13 +129,15 @@ export default function Page() {
               placeholder="Building ecommerce platform with realtime inventory synchronization, high transactional throughput and analytical reporting..."
               minLength={20}
               maxLength={5000}
-              onChange={handleChange}
+              value={projectDesc}
+              onChange={(e) => setProjectDesc(e.target.value)}
               disabled={isSubmitting}
             />
 
             <div className="flex gap-2 item-center justify-between mt-4">
               <button
-                className={isSubmitting || projectDesc.trim() === "" ? "rounded-2xl px-6 py-3 text-sm font-medium bg-zinc-700 cursor-not-allowed" : "rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black"}
+                className="rounded-2xl bg-lime-300 px-6 py-3 text-sm font-medium text-black disabled:bg-zinc-700 disabled:text-zinc-400 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={isSubmitting || projectDesc.trim() === ""}
               >
                 Analyze Project
               </button>
