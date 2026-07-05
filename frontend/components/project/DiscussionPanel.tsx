@@ -2,9 +2,9 @@
 
 import axios from "axios";
 import { SubmitEvent, useState } from "react";
-import Discussions from "./Discussions";
 import { Exchange } from "@/types/project";
 import { getResponse } from "@/services/conversation";
+import DiscussionExchange from "./DiscussionExchange";
 
 interface DiscussionPanelProps {
   exchanges: Exchange[];
@@ -57,7 +57,7 @@ export default function DiscussionPanel({
         </p>
       </div>
 
-      <Discussions exchanges={uiExchanges} />
+      <DiscussionExchange exchanges={uiExchanges} />
 
       <div className="border-t border-zinc-800 p-4">
         <form onSubmit={handleExchangeClick}>

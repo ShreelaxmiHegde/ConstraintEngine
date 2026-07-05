@@ -30,7 +30,7 @@ export default function Page({ params }: PageProps) {
       try {
         const { projectId } = await params;
         const res = await fetchProject(projectId);
-
+        console.log(res);
         setProject(res);
       } catch (err) {
         console.error(err);

@@ -1,5 +1,5 @@
 import express from "express";
-import { findOrCreateConversation } from "../controller/conversation.controller.js";
+import { startConversation } from "../controller/conversation.controller.js";
 import { asyncWrapper } from "../utils/asyncWrapper.js";
 import { validateBody } from "../middleware/validateBody.middleware.js";
 import { PromptClassifierSchema } from "../schemas/classifier.schema.js";
@@ -17,7 +17,7 @@ router.route("/")
     asyncWrapper(sanitizePromptInput),
     asyncWrapper(promptRateLimiter),
     asyncWrapper(promptIntentClassifier),
-    asyncWrapper(findOrCreateConversation)
+    asyncWrapper(startConversation)
   )
 
 export default router;

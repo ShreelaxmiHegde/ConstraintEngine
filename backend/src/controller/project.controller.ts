@@ -7,6 +7,7 @@ import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 import { ProjectInputBody } from "../schemas/classifier.schema.js";
 import { verifyToken } from "../utils/token.js";
+import * as conversation from "../services/conversation.service.js";
 
 
 export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res: Response) => {
@@ -28,6 +29,9 @@ export const createProject = async (req: Request<{}, {}, ProjectInputBody>, res:
 
   // save raw data
   const projectData = await project.createInstance(ownerId, rawDescription);
+
+  // initiate exchange instance
+  await conversation.createInstance(projectData.id);
 
   // extract constraints from agent
   const response = await fetch(`${fastapiURL}/extract/constraints`, {

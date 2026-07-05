@@ -1,8 +1,5 @@
 import "dotenv/config";
-import prisma from "../lib/prisma.js";
 import { Request, Response } from "express";
-import { conversationBody } from "../types/types.js";
-import { saveMessage } from "../services/exchange.service.js";
 import * as conversation from "../services/conversation.service.js";
 import { fastapiURL } from "../constants.js";
 import { createContext } from "../services/exchange.service.js";
@@ -13,17 +10,13 @@ import * as project from "../services/project.service.js";
 import * as exchange from "../services/exchange.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
 
-export const findOrCreateConversation = async (req: Request, res: Response) => {
+export const startConversation = async (req: Request, res: Response) => {
   console.log(req.body.prompt);
   let { prompt, projectId, conversationId } = req.body;
 
-  if (!conversationId) throw new ExpressError("no conversationid provided", 403); //temporary
+  const conversationData = await conversation.findById(conversationId);
 
-  if (!conversationId) {
-    // create conversation instance
-    const convData = await conversation.createInstance(projectId);
-    conversationId = convData.id;
-  }
+  if (!conversationData) throw new ExpressError("no conversation found", 403);
 
   // generate context
   const context = await createContext(
@@ -33,7 +26,7 @@ export const findOrCreateConversation = async (req: Request, res: Response) => {
   );
 
   // create exchange instance
-  const exchangeInstance = await exchange.createInstance(conversationId, prompt);
+  const exchangeInstance = await exchange.createInstance(conversationData.id, prompt);
 
   // send prompt to agent
   const response = await fetch(`${fastapiURL}/architecture/respond`, {
@@ -66,39 +59,5 @@ export const findOrCreateConversation = async (req: Request, res: Response) => {
   return res.status(201).json({
     success: true,
     response: exchangeData.responseText
-  });
-}
-
-
-export const createGuestSession = async (req: Request<{}, {}, conversationBody>, res: Response) => {
-  console.log("Request got: ", req.body);
-  const content = req.body.content;
-  const title = content.split(' ').slice(0, 3).join(' ');
-
-  // create guest user
-  const guest = await prisma.guestSession.create({});
-  const guestId = guest.id;
-  console.log(guest);
-
-  // create conversation
-  const convData = await conversation.findOrCreate(undefined, guestId, title)
-  const conversationId = convData.id;
-  console.log(conversation);
-
-  // store query/message in that convo
-  const message = await saveMessage(conversationId, content);
-  console.log(message);
-
-  const agentResponse = await fetch(`${fastapiURL}/m`, {
-    method: "POST",
-    body: JSON.stringify({ "query": content }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  const data = await agentResponse.json();
-  console.log(data.response);
-
-  return res.json({
-    reply: data
   });
 }
