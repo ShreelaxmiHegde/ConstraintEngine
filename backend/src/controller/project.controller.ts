@@ -79,6 +79,7 @@ export const getProjectData = async (req: Request, res: Response) => {
   if (!data) throw new ExpressError("No project found", 404);
 
   return res.status(201).json({
+    id: data.id,
     project: {
       desc: data.rawDescription,
       constraints: data.extractedConstraints,

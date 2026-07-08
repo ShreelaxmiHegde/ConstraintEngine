@@ -8,10 +8,14 @@ import DiscussionExchange from "./DiscussionExchange";
 
 interface DiscussionPanelProps {
   exchanges: Exchange[];
+  projectId: string;
+  conversationId: string;
 }
 
 export default function DiscussionPanel({
   exchanges,
+  projectId,
+  conversationId
 }: DiscussionPanelProps) {
   const [exchange, setExchange] = useState("");
   const [uiExchanges, setUiExchanges] = useState<Exchange[]>(exchanges);
@@ -25,7 +29,7 @@ export default function DiscussionPanel({
     setError("");
 
     try {
-      const res = await getResponse(exchange);
+      const res = await getResponse(exchange, projectId, conversationId);
       const newExchange: Exchange = {
         queryText: exchange,
         responseText: res.response,
@@ -74,7 +78,7 @@ export default function DiscussionPanel({
 
           <div className="flex gap-2 item-center justify-between mt-4 ">
             {isSubmitting && (
-              <p className="animate-pulse text-lime-400">Validating your message...</p>
+              <p className="animate-pulse text-lime-400">Sending your message...</p>
             )}
             {error && (
               <p className="text-red-600"><i>{"> "}{error}</i></p>

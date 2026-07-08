@@ -11,6 +11,8 @@ import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel"
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
+import PageNotFound from "@/components/ui/PageNotFound";
+import axios from "axios";
 
 type PageProps = {
   params: Promise<{ projectId: string }>
@@ -34,13 +36,20 @@ export default function Page({ params }: PageProps) {
         setProject(res);
       } catch (err) {
         console.error(err);
+        if (axios.isAxiosError(err)) {
+          console.log(err.response?.data);
+        }
+        if (!project) {
+          console.log("no project")
+          return <PageNotFound />;
+        }
       } finally {
         setLoading(false);
       }
     }
 
     loadProject();
-  }, [params]);
+  }, [params, project]);
 
   return (
     <>
@@ -58,7 +67,9 @@ export default function Page({ params }: PageProps) {
               <ArchitectureStatePanel
                 currVersion={project.archVersions[0]}
               />
-              <DiscussionPanel exchanges={project.conversation.exchanges} />
+              <DiscussionPanel exchanges={project.conversation.exchanges}
+                projectId={project.id}
+                conversationId={project.conversation.id} />
             </div>
 
             <div className="col-span-6">
@@ -87,6 +98,8 @@ export default function Page({ params }: PageProps) {
           </div>
         </div>
       )}
+
+      {!project && (<PageNotFound />)}
 
     </>
   )

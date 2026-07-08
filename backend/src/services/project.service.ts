@@ -74,12 +74,14 @@ export const fetchAllIn = async (projectId: string) => {
   const data = await prisma.project.findUnique({
     where: { id: projectId },
     select: {
+      id: true,
       rawDescription: true,
       extractedConstraints: true,
       currentArchitectureVersion: true,
 
       conversation: {
         select: {
+          id: true,
           exchanges: {
             select: {
               queryText: true,
