@@ -58,6 +58,38 @@ ConstraintEngine is an AI-powered full-stack application built for Software appl
 
 ---
 
+## Tradeoffs Made
+
+<table>
+  <tr>
+    <th>Tradeoff</th>
+    <th>Pros</th>
+    <th>Cons</th>
+  </tr>
+  <tr>
+    <td>Rejecting before AI Agent invocation</td>
+    <td>Lower cost, cleaner database</td>
+    <td>small llm preprocessing latency</td>
+  </tr>
+  <tr>
+    <td>Save twice before and after AI agent response</td>
+    <td>Retryable</td>
+    <td>Additional DB write operation</td>
+  </tr>
+  <tr>
+    <td>Custom rate limiter</td>
+    <td>customizable, more control</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Database as source of truth instead of agent framework attributes for context management</td>
+    <td>More control</td>
+    <td>Context management overhead on backend</td>
+  </tr>
+</table>
+
+---
+
 ## Case Studies
 1. [Designing AI Backend That Rejects Bad Requests Before They Reach The LLM](https://github.com/ShreelaxmiHegde/ConstraintEngine/tree/main#1-designing-ai-backend-that-rejects-bad-requests-before-they-reach-the-llm)
 2. [Designing Product-Aware Rate Limits Instead of Generic API Limits](https://github.com/ShreelaxmiHegde/ConstraintEngine/tree/main#2-designing-product-aware-rate-limits-instead-of-generic-api-limits)
@@ -187,35 +219,3 @@ I had 2 reasonable approaches:
 
 
 ### 6. Managing Agent Output and maintaining consistent structure throughout the application -->
-
----
-
-## Tradeoffs Made
-
-<table>
-  <tr>
-    <th>Tradeoff</th>
-    <th>Pros</th>
-    <th>Cons</th>
-  </tr>
-  <tr>
-    <td>Rejecting before AI Agent invocation</td>
-    <td>Lower cost, cleaner database</td>
-    <td>small llm preprocessing latency</td>
-  </tr>
-  <tr>
-    <td>Save twice before and after AI agent response</td>
-    <td>Retryable</td>
-    <td>Additional DB write operation</td>
-  </tr>
-  <tr>
-    <td>Custom rate limiter</td>
-    <td>customizable, more control</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Database as source of truth instead of agent framework attributes for context management</td>
-    <td>More control</td>
-    <td>Context management overhead on backend</td>
-  </tr>
-</table>
