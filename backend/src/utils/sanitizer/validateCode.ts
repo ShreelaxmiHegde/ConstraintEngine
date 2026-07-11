@@ -5,8 +5,6 @@ const regex = {
   repeated: /(.)\1{9,}/,
   html: /<\/?[a-z][\s\S]*>/i,
   symbol: /^[^a-zA-Z0-9\s]{10,}$/,
-  sql: /\b(select|insert|update|delete|create|drop|alter)\b/i,
-  js: /\b(function|const|let|var|import|export|class)\b/,
   random: /^[a-z]{5,}$/i
 };
 

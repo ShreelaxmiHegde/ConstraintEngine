@@ -4,8 +4,14 @@ export const ProjectInputSchema = z.object({
   rawDescription: z.string().min(20).max(5000)
 });
 
+export const ProjectIdSchema = z.object({
+  id: z.uuid()
+});
+
 export const PromptInputSchema = z.object({
-  prompt: z.string().min(1).max(300)
+  prompt: z.string().min(1).max(300),
+  projectId: z.uuid(),
+  conversationId: z.uuid()
 });
 
 export const ProjectClassifierSchema = z.object({

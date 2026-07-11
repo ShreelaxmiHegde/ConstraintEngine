@@ -5,7 +5,7 @@ import * as project from "../services/project.service.js";
 import * as user from "../services/user.service.js";
 import { saveConstraints } from "../services/project.service.js";
 import { ExpressError } from "../utils/ExpressError.js";
-import { ProjectInputBody } from "../schemas/classifier.schema.js";
+import { ProjectIdSchema, ProjectInputBody } from "../schemas/classifier.schema.js";
 import { verifyToken } from "../utils/token.js";
 import * as conversation from "../services/conversation.service.js";
 
@@ -69,10 +69,10 @@ export const getProjects = async (req: Request, res: Response) => {
 }
 
 export const getProjectData = async (req: Request, res: Response) => {
+  const projectId = ProjectIdSchema.parse(req.params);
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
 
-  const projectId = req.params.id;
   if (!(typeof projectId === "string")) throw new ExpressError("No project found.", 404);
 
   const data = await project.fetchAllIn(projectId);

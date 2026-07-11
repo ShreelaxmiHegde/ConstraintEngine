@@ -9,6 +9,13 @@ export function errorHandler(
 ) {
 
   console.log(err)
+  if (err.name === "PrismaClientKnownRequestError") {
+    err.message = "You provided invalid projectId";
+  }
+
+  if (err.name === "ZodError") {
+    err.message = "Invalid request";
+  }
 
   return res.status(err.statusCode || 500).json({
     statusCode: err.statusCode,

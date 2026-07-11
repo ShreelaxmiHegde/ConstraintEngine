@@ -20,7 +20,6 @@ import * as refreshSession from "../services/auth.service.js";
 
 
 export const signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
-  console.log("Signup Request: ", req.body);
   const { username, email, password, guestId } = req.body;
 
   const userExist = await user.findByEmail(email);
