@@ -1,4 +1,11 @@
-### 1. Designing AI Backend That Rejects Bad Requests Before They Reach The Agent
+# Index
+1. [Designing AI Backend That Rejects Bad Requests Before They Reach The Agent](https://github.com/ShreelaxmiHegde/ConstraintEngine/blob/main/case-studies.md#1-designing-ai-backend-that-rejects-bad-requests-before-they-reach-the-agent)
+2. [Designing Product-Aware Rate Limits Instead of Generic API Limits](https://github.com/ShreelaxmiHegde/ConstraintEngine/blob/main/case-studies.md#2-designing-product-aware-rate-limits-instead-of-generic-api-limits)
+3. [Designing an AI Request Pipeline from Lowest to Highest Cost](https://github.com/ShreelaxmiHegde/ConstraintEngine/blob/main/case-studies.md#3-designing-an-ai-request-pipeline-from-lowest-to-highest-cost)
+
+---
+
+## 1. Designing AI Backend That Rejects Bad Requests Before They Reach The Agent
 Every AI request has a monetary cost and processing latency.
 Therefore, every unnecessary request that reaches the AI Agent wastes compute and pollutes stored conversations.
 
@@ -41,7 +48,7 @@ Overall the workflow ordered from low to high expensive tasks by rejecting inval
 
 ---
 
-### 2. Designing Product-Aware Rate Limits Instead of Generic API Limits
+## 2. Designing Product-Aware Rate Limits Instead of Generic API Limits
 In ConstraintEngine, Rate limiting applied 
 - to LLM endpoints only
 - before validating the request content and processing it
@@ -57,14 +64,14 @@ Limits project creation to 2/week. Because a user creating 3+ projects in a week
 
 Limits conversations to 5/day including valid and invalid requests. So that it can prevent unnecessary content validation requests and promote genuine architectural discussions by users.
 
-#### <ins><b>Why generic rate limiting is insufficient here?</b></ins> </br>
+### <ins><b>Why generic rate limiting is insufficient here?</b></ins> </br>
 Generic rate limiting (e.g., 100 requests/minute) treats every endpoint equally. In ConstraintEngine, each AI endpoint has different user behavior & business value so each requires its own rate-limiting policy.
 
 **Existing middleware like `express-rate-limiter` would have solved the problem, but implementing a lightweight forward-window limiter allowed the algorithm to remain transparent, customizable and sufficient to project's scale.
 
 ---
 
-### 3. Designing an AI Request Pipeline from Lowest to Highest Cost
+## 3. Designing an AI Request Pipeline from Lowest to Highest Cost
 This is the structure of the AI agent endpoints in ConstraintEngine:
 
 ```mermaid
@@ -95,13 +102,13 @@ flowchart LR
 
 The pipeline is intentionally ordered from the cheapest operations to the most expensive. Each stage filters requests before they consume additional compute resources.
 
-#### <ins><b>Why to have rate limiter before the LLM content validation?</b></ins> </br>
+### <ins><b>Why to have rate limiter before the LLM content validation?</b></ins> </br>
 The Rate Limiter which runs before LLM content validation to prevent LLM cost on requests.
 
-#### <ins><b>Why LLM content validation? why not do at the time of actual agent processing?</b></ins> </br>
+### <ins><b>Why LLM content validation? why not do at the time of actual agent processing?</b></ins> </br>
 This tradeoff comes with small preprocessing cost but significantly reduces unnecessary LLM requests and keeps the database clean. Its was possible to reject when the AI agent finds the request invalid but while reaching there, it already have increased latency, processing cost and have saved inconsistant data in the database.
 
-#### <ins><b>Why to save data before and after AI agent response (twice) not doing once after AI agent responds?</b></ins> </br>
+### <ins><b>Why to save data before and after AI agent response (twice) not doing once after AI agent responds?</b></ins> </br>
 I had 2 reasonable approaches:
 1. Approach1: Save Once
     - Pros: single DB call
