@@ -1,18 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { fetchProject } from "@/services/project.service";
+import Link from "next/link";
+import axios from "axios";
+import { ExternalLink } from "lucide-react";
 import { ProjectType } from "@/types/project";
+import { fetchProject } from "@/services/project.service";
 import RawVersion from "@/components/project/RawVersions";
 import ProjectHeader from "@/components/project/ProjectHeader";
 import DiscussionPanel from "@/components/project/DiscussionPanel";
 import ConstraintsPanel from "@/components/project/ConstraintsPanel";
 import ArchitectureStatePanel from "@/components/project/ArchitectureStatePanel";
 import ArchitecturalReasoningPanel from "@/components/project/ArchitecturalReasoningPanel";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
 import PageNotFound from "@/components/ui/PageNotFound";
-import axios from "axios";
+import Unauthorized from "@/components/ui/Unauthorized";
 
 type PageProps = {
   params: Promise<{ projectId: string }>
@@ -21,6 +22,8 @@ type PageProps = {
 export default function Page({ params }: PageProps) {
   const [project, setProject] = useState<ProjectType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
 
   const countDecision = project?.archVersions.reduce(
     (count, version) => count + version.decisions.length,
@@ -32,16 +35,14 @@ export default function Page({ params }: PageProps) {
       try {
         const { projectId } = await params;
         const res = await fetchProject(projectId);
-        console.log(res);
         setProject(res);
       } catch (err) {
-        console.error(err);
-        if (axios.isAxiosError(err)) {
-          console.log(err.response?.data);
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          setNotFound(true);
         }
-        if (!project) {
-          console.log("no project")
-          return <PageNotFound />;
+
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          setUnauthorized(true);
         }
       } finally {
         setLoading(false);
@@ -49,7 +50,15 @@ export default function Page({ params }: PageProps) {
     }
 
     loadProject();
-  }, [params, project]);
+  }, [params]);
+
+  if (notFound) {
+    return <PageNotFound />;
+  }
+
+  if (unauthorized) {
+    return <Unauthorized />;
+  }
 
   return (
     <>
@@ -98,9 +107,6 @@ export default function Page({ params }: PageProps) {
           </div>
         </div>
       )}
-
-      {!project && (<PageNotFound />)}
-
     </>
   )
 }
