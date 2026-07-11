@@ -59,6 +59,10 @@ ConstraintEngine is an AI-powered full-stack application built for Software appl
 ---
 
 ## Case Studies
+1. [Designing AI Backend That Rejects Bad Requests Before They Reach The LLM](https://github.com/ShreelaxmiHegde/ConstraintEngine/tree/main#1-designing-ai-backend-that-rejects-bad-requests-before-they-reach-the-llm)
+2. [Designing Product-Aware Rate Limits Instead of Generic API Limits](https://github.com/ShreelaxmiHegde/ConstraintEngine/tree/main#2-designing-product-aware-rate-limits-instead-of-generic-api-limits)
+
+---
 
 ### 1. Designing AI Backend That Rejects Bad Requests Before They Reach The LLM
 Every AI request has a monetary cost and processing latency.
@@ -101,6 +105,8 @@ flowchart TD
 Before the request hits the AI Agent, it should successfully pass all the checks.
 Overall the workflow ordered from low to high expensive tasks by rejecting invalid requests early reducing latency, LLM cost and relevent data storing.
 
+---
+
 ### 2. Designing Product-Aware Rate Limits Instead of Generic API Limits
 In ConstraintEngine, Rate limiting applied 
 - to LLM endpoints only
@@ -117,61 +123,51 @@ here, the rate limiter limits max 2 project creation for a week timeframe. Becau
 
 The rate limiter limits at most 5 conversational exchanges a day. The rate limiter counts the valid and invalid requests. So that it can prevent unnecessary content validation requests and promote genuine architectural discussions by users.
 
-<u><b>Why generic rate limiting is insufficient here?</b></u> </br>
-Generalizing limiting to 100 req/min for all endpoints unnecessary and not reasonable.
+#### <ins><b>Why generic rate limiting is insufficient here?</b></ins> </br>
+Generic rate limiting (e.g., 100 requests/minute) treats every endpoint equally. In ConstraintEngine, each AI endpoint has different user behavior & business value so each requires its own rate-limiting policy.
 
-*Existing middleware like `express-rate-limiter` would have solved the problem, but implementing a light-weight forward-window limiter allowed the algorithm to remain transperent, customizable and sufficient to project's scale.
+**Existing middleware like `express-rate-limiter` would have solved the problem, but implementing a light-weight forward-window limiter allowed the algorithm to remain transperent, customizable and sufficient to project's scale.
 
+---
 
 ### 3. Designing an AI Request Pipeline from Lowest to Highest Cost
 This is the structure of the AI agent endpoints in ConstraintEngine:
 
 ```mermaid
-flowchart TD
-    A([Client Request])
+flowchart LR
+    A([Request])
 
-    subgraph Cheap["Low-Cost Processing"]
-        B["Logical Input Validation<br/>(Schema, Length, Gibberish)"]
-        C["Rate Limiter"]
+    subgraph Low Cost
+        B["Schema Validation"]
+        C["Input Validation"]
+        D["Gibberish Detection"]
+        E["Rate Limiting"]
     end
 
-    subgraph Moderate["Moderate Cost"]
-        D["Light LLM Content Validation"]
+    subgraph Medium Cost
+        F["LLM Content Validation"]
     end
 
-    subgraph Expensive["High-Cost Processing"]
-        E[(Save User Request)]
-        F["AI Agent Invocation"]
-        G[(Save AI Response)]
+    subgraph High Cost
+        G[(Persist Request)]
+        H["AI Agent"]
+        I[(Persist Response)]
     end
 
-    A --> B
-    B --> C
-    C --> D
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J([Response])
 
-    D -->|Invalid| X([Reject Request])
-
-    D -->|Valid| E
-    E --> F
-    F --> G
-    G --> H([Return AI Response])
-
-    style D fill:#fff3cd
-    style F fill:#ffd6a5
-    style E fill:#d5f5e3
-    style G fill:#d5f5e3
-    style X fill:#f8d7da
+    F -->|Invalid| X([Reject])
 ```
 
 The pipeline is intentionally ordered from the cheapest operations to the most expensive. Each stage filters requests before they consume additional compute resources.
 
-<u><b>Why to have rate limiter before the LLM content validation?</b></u> </br>
+#### <ins><b>Why to have rate limiter before the LLM content validation?</b></ins> </br>
 The Rate Limiter which runs before LLM content validation to prevent LLM cost on requests.
 
-<u><b>Why LLM content validation? why not do at the time of actual agent processing?</b></u> </br>
+#### <ins><b>Why LLM content validation? why not do at the time of actual agent processing?</b></ins> </br>
 This tradeoff comes with small preprocessing cost but significantly reduces unnecessary LLM requests and keeps the database clean. Its was possible to reject when the AI agent finds the request invalid but while reaching there, it already have increased latency, processing cost and have saved inconsistant data in the database.
 
-<u><b>Why to save data before and after AI agent response (twice) not doing once after AI agent responds?</b></u> </br>
+#### <ins><b>Why to save data before and after AI agent response (twice) not doing once after AI agent responds?</b></ins> </br>
 I had 2 reasonable approaches:
 1. Approach1: Save Once
     - Pros: single DB call
@@ -183,13 +179,16 @@ I had 2 reasonable approaches:
 
   I chose the Approach2. Because it supports request recovery and retry workflows. i.e, if some internal error happens while AI agent invocation, then the user request also gone if we dont save it. So, here making the tradeoff between the DB calls and Request retry was reasonable.
 
-### 4. Designing Database and Content Schema Compatible To AI Response
+
+<!-- ### 4. Designing Database and Content Schema Compatible To AI Response
 
 
 ### 5. Managing Agent Context
 
 
-### 6. Managing Agent Output and maintaining consistent structure throughout the application
+### 6. Managing Agent Output and maintaining consistent structure throughout the application -->
+
+---
 
 ## Tradeoffs Made
 
