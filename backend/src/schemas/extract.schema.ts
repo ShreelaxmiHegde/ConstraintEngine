@@ -3,7 +3,6 @@ import { z } from "zod";
 export const ConstraintSchema = z.object({
   category: z.string(),
   value: z.string(),
-  source: z.string(),
   confidence: z.number()
 });
 
@@ -24,13 +23,16 @@ export const JsonValueSchema: z.ZodTypeAny = z.lazy(() =>
   ])
 );
 
+const AchitectureState = z.object({
+  key: z.string(),
+  value: z.union([z.string(), z.array(z.string())])
+});
+
 export const ExtractConstraintOutputSchema = z.object({
   constraints: z.array(ConstraintSchema),
-
-  // Equivalent to Python `dict`
-  architectureState: z.record(z.string(), JsonValueSchema),
+  decisions: z.array(DecisionSchema),
+  architectureState: z.array(AchitectureState),
   summary: z.string(),
-  decisions: z.array(DecisionSchema)
 });
 
 export type Constraint = z.infer<typeof ConstraintSchema>;
