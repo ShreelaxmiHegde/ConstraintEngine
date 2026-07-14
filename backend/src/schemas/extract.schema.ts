@@ -12,20 +12,9 @@ export const DecisionSchema = z.object({
   confidence: z.number()
 });
 
-export const JsonValueSchema: z.ZodTypeAny = z.lazy(() =>
-  z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.null(),
-    z.array(JsonValueSchema),
-    z.record(z.string(), JsonValueSchema)
-  ])
-);
-
-const AchitectureState = z.object({
+export const AchitectureState = z.object({
   key: z.string(),
-  value: z.union([z.string(), z.array(z.string())])
+  value: z.array(z.string())
 });
 
 export const ExtractConstraintOutputSchema = z.object({

@@ -30,8 +30,8 @@ export default function DiscussionExchange({
           className="max-h-[300px] space-y-8 overflow-y-auto p-6"
           ref={chatRef}
         >
-          {exchanges.map((exchange) => (
-            <>
+          {exchanges.map((exchange, idx) => (
+            <div key={idx}>
               <div className="space-y-4">
                 {/* User */}
                 <div className="flex justify-end">
@@ -49,7 +49,7 @@ export default function DiscussionExchange({
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           ))}
         </div>
       }

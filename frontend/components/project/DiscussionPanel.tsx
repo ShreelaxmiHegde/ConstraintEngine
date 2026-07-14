@@ -78,7 +78,7 @@ export default function DiscussionPanel({
 
           <div className="flex gap-2 item-center justify-between mt-4 ">
             {isSubmitting && (
-              <p className="animate-pulse text-lime-400">Sending your message...</p>
+              <p className="animate-pulse text-lime-400">Getting response...</p>
             )}
             {error && (
               <p className="text-red-600"><i>{"> "}{error}</i></p>

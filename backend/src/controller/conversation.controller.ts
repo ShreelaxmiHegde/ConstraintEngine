@@ -45,7 +45,7 @@ export const startConversation = async (req: Request, res: Response) => {
     data.conversation
   );
 
-  if (data.projectModified && data.newVersion) {
+  if (data.newVersion) {
     // update ArchitectureVersion
     const newArchVersion = await archVersion.createNew(projectId, data.newVersion);
 

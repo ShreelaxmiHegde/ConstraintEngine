@@ -69,13 +69,14 @@ export const getProjects = async (req: Request, res: Response) => {
 }
 
 export const getProjectData = async (req: Request, res: Response) => {
-  const projectId = ProjectIdSchema.parse(req.params);
+  const { id } = ProjectIdSchema.parse(req.params);
+
   const user = req.user;
   if (!user) throw new ExpressError("Unauthorized access", 401);
 
-  if (!(typeof projectId === "string")) throw new ExpressError("No project found.", 404);
+  if (!(typeof id === "string")) throw new ExpressError("No project found.", 404);
 
-  const data = await project.fetchAllIn(projectId);
+  const data = await project.fetchAllIn(id);
   if (!data) throw new ExpressError("No project found", 404);
 
   return res.status(201).json({

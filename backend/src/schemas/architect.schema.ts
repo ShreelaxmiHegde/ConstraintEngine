@@ -1,12 +1,10 @@
 import { z } from "zod";
-import { DecisionSchema, JsonValueSchema } from "./extract.schema.js";
+import { DecisionSchema, AchitectureState } from "./extract.schema.js";
 
 /* Enums */
 const IntentSchema = z.enum([
   "QUESTION",
-  "PROPOSE_CHANGE",
-  "ACCEPT_CHANGE",
-  "REJECT_CHANGE",
+  "CHANGE_REQUEST"
 ]);
 
 const ChangeTypeSchema = z.enum([
@@ -20,21 +18,27 @@ const ChangeTypeSchema = z.enum([
 /* Models */
 const ArchitectureVersionSchema = z.object({
   summary: z.string(),
-  architectureState: z.record(z.string(), JsonValueSchema),
+  architectureState: z.array(AchitectureState),
   decisions: z.array(DecisionSchema)
 });
 
 export const ArchitectureChangeSchema = z.object({
   changeType: ChangeTypeSchema,
   target: z.string(),
-  newVal: z.record(z.string(), JsonValueSchema).nullable(),
-  oldVal: z.record(z.string(), JsonValueSchema).nullable(),
+  newVal: AchitectureState.nullable(),
+  oldVal: AchitectureState.nullable(),
   reasoning: z.string(),
 });
+
+const ChangeStatus = z.enum([
+  "ACCEPTED",
+  "REJECTED"
+]);
 
 export const ExchangeSchema = z.object({
   responseText: z.string(),
   exchangeIntent: IntentSchema,
+  changeStatus: ChangeStatus.nullable(),
   stateChanged: z.boolean(),
 });
 
@@ -42,7 +46,6 @@ export const ArchitectureOutputSchema = z.object({
   changes: z.array(ArchitectureChangeSchema).default([]),
   newVersion: ArchitectureVersionSchema.nullable(),
   conversation: ExchangeSchema,
-  projectModified: z.boolean(),
 });
 
 /* Types */

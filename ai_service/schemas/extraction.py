@@ -30,8 +30,12 @@ class Decision(BaseModel):
   )
 
 class ArchitectureItem(BaseModel):
-  key: str
-  value: str | list[str]
+  key: str = Field(
+    description="Architecture concept (e.g. backend, database authentication, deployment, API, frontend)."
+  )
+  value: list[str] = Field(
+    description="Current technologies, components or architectural choices."
+  )
 
 class ExtractConstraintOutput(BaseModel):
   constraints: list[Constraint] = Field(

@@ -26,8 +26,9 @@ export default function Page() {
     setError("");
 
     try {
+      console.log("1. hit button");
       const res = await createProject(projectDesc);
-      console.log(res);
+      console.log("10. got response", res);
       router.push(`/projects/${res.projectId}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -143,7 +144,7 @@ export default function Page() {
               </button>
 
               {isSubmitting && (
-                <p className="animate-pulse text-lime-400">Validating your message...</p>
+                <p className="animate-pulse text-lime-400">Getting response...</p>
               )}
               {error && (
                 <p className="text-red-600"><i>{"> "}{error}</i></p>
