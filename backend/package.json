@@ -1,5 +1,5 @@
 {
-  "name": "agent_agno",
+  "name": "ConstraintEngine/backend",
   "version": "1.0.0",
   "description": "Backend service for 'Database architect agent'",
   "main": "index.js",
@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node build/server.js"
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",
