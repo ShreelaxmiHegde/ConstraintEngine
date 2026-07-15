@@ -2,7 +2,7 @@ import axios from "axios";
 import { useToastStore } from "@/store/toastStore";
 import { logout, refresh } from "@/services/auth.service";
 
-const baseURL = "http://localhost:8080";
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 if (!baseURL) {
   throw new Error(
