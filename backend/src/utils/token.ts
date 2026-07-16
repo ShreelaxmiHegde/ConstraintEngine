@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { sign, verify, JsonWebTokenError } from "jsonwebtoken";
 import { createHash, randomBytes } from "node:crypto";
 import "dotenv/config";
 import { ExpressError } from "./ExpressError.js";
@@ -45,7 +45,7 @@ export const signAccessToken = (user: UserBody) => {
     email: user.email
   }
 
-  return jwt.sign(
+  return sign(
     payload,
     JWT_SECRET,
     { expiresIn: ACCESS_TTL }
@@ -57,7 +57,7 @@ export const signRefreshToken = (userId: string, jwtId: string) => {
 
   if (!REFRESH_TOKEN_SECRET) throw new ExpressError("Missing refresh token", 500);
 
-  const token = jwt.sign(
+  const token = sign(
     payload,
     REFRESH_TOKEN_SECRET,
     { expiresIn: REFRESH_TTL_SEC }
@@ -130,7 +130,7 @@ export const verifyToken = (req: Request, token: string) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, JWT_SECRET);
+    decoded = verify(token, JWT_SECRET);
 
     if (typeof decoded === "string") {
       console.log("ERROR LOG: Invalid token payload");
@@ -140,7 +140,7 @@ export const verifyToken = (req: Request, token: string) => {
     req.user = decoded as AuthPayload;
 
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
+    if (error instanceof JsonWebTokenError) {
       console.log(`ERROR LOG: ${error.message}`, error);
       throw new ExpressError("Unauthorized access", 401);
     } else if (error instanceof Error) {
