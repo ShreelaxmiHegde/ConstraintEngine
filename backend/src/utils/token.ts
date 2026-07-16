@@ -143,8 +143,9 @@ export const verifyToken = (req: Request, token: string) => {
     if (error instanceof jwt.JsonWebTokenError) {
       console.log(`ERROR LOG: ${error.message}`, error);
       throw new ExpressError("Unauthorized access", 401);
+    } else {
+      console.log("ERROR LOG: Invalid token", error);
+      throw new ExpressError("Unauthorized access", 401);
     }
-    console.log("ERROR LOG: Invalid token", error);
-    throw new ExpressError("Unauthorized access", 401);
   }
 }
