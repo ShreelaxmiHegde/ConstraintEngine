@@ -16,7 +16,8 @@
       "./node_modules/@types",
       "./src/types",
       "./typings"
-    ]
+    ],
+    "noImplicitAny": false
   },
   "include": [
     "src"
