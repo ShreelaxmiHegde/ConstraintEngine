@@ -139,7 +139,7 @@ export const verifyToken = (req: Request, token: string) => {
 
     req.user = decoded as AuthPayload;
 
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       console.log(`ERROR LOG: ${error.message}`, error);
       throw new ExpressError("Unauthorized access", 401);

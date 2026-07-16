@@ -112,7 +112,7 @@ export const refresh = async (req: Request, res: Response) => {
       throw new ExpressError("Invalid token payload", 401);
     }
 
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       throw new ExpressError(error.message, 401);
     }
