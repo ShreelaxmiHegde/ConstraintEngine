@@ -115,6 +115,8 @@ export const refresh = async (req: Request, res: Response) => {
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       throw new ExpressError(error.message, 401);
+    } else if (error instanceof Error) {
+      throw new ExpressError("Invalid token", 401);
     } else {
       throw new ExpressError("Invalid token", 401);
     }
