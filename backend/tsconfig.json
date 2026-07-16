@@ -13,8 +13,9 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "typeRoots": [
-      "./typings",
-      "./node_modules/@types/"
+      "./node_modules/@types",
+      "./src/types",
+      "./typings"
     ]
   },
   "include": [
