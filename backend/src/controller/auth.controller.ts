@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { verify, JsonWebTokenError } from "jsonwebtoken";
+import { verify } from "jsonwebtoken";
 import { AuthPayload } from "../types/types.js";
 import { SignUpBody, LoginBody } from "../schemas/auth.schema.js";
 import * as user from "../services/user.service.js";
@@ -113,9 +113,7 @@ export const refresh = async (req: Request, res: Response) => {
     }
 
   } catch (error) {
-    if (error instanceof JsonWebTokenError) {
-      throw new ExpressError(error.message, 401);
-    } else if (error instanceof Error) {
+    if (error instanceof Error) {
       throw new ExpressError("Invalid token", 401);
     } else {
       throw new ExpressError("Invalid token", 401);

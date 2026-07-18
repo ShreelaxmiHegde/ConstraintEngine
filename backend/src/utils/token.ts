@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sign, verify, JsonWebTokenError } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import { createHash, randomBytes } from "node:crypto";
 import "dotenv/config";
 import { ExpressError } from "./ExpressError.js";
@@ -140,10 +140,7 @@ export const verifyToken = (req: Request, token: string) => {
     req.user = decoded as AuthPayload;
 
   } catch (error) {
-    if (error instanceof JsonWebTokenError) {
-      console.log(`ERROR LOG: ${error.message}`, error);
-      throw new ExpressError("Unauthorized access", 401);
-    } else if (error instanceof Error) {
+    if (error instanceof Error) {
       throw new ExpressError("Unauthorized access", 401);
     } else {
       console.log("ERROR LOG: Invalid token", error);
