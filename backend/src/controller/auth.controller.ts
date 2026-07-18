@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { AuthPayload } from "../types/types.js";
 import { SignUpBody, LoginBody } from "../schemas/auth.schema.js";
 import * as user from "../services/user.service.js";
@@ -106,7 +106,7 @@ export const refresh = async (req: Request, res: Response) => {
   // decode refresh token
   let decoded;
   try {
-    decoded = verify(token, REFRESH_TOKEN_SECRET);
+    decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
 
     if (typeof decoded === "string") {
       throw new ExpressError("Invalid token payload", 401);
@@ -168,7 +168,7 @@ export const getMe = async (req: Request, res: Response) => {
   if (!token) throw new ExpressError("Access token not found", 401);
 
   if (!JWT_SECRET) throw new ExpressError("Missing JWT_SECTRET", 500);
-  const decoded = verify(token, JWT_SECRET);
+  const decoded = jwt.verify(token, JWT_SECRET);
   const decodedUser = decoded as AuthPayload;
   const userData = await user.findById(decodedUser.userId);
 
