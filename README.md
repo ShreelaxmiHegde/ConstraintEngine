@@ -1,6 +1,9 @@
 # ConstraintEngine
 ConstraintEngine is an AI-powered architecture reasoning platform that analyzes software project requirements, extracts architectural constraints, and generates architecture recommendations while demonstrating production-oriented AI backend design patterns such as request validation, cost-aware processing, structured agent outputs, and context management.
 
+## Project Demo
+<video controls src="public/demo.mp4" title="ConstraintEngine Demo"></video>
+
 ## Architecture
 
 ```mermaid
